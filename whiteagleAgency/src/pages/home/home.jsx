@@ -36,6 +36,9 @@ export default function Home() {
                     Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos, dolore similique nostrum tempora incidunt vero aliquam, illum culpa atque est ipsam, vel non commodi eligendi. Facilis modi aliquid sapiente veritatis.
                 </p>
             </section>
+            <div>
+                <h1>Nuestro Staff</h1>
+            </div>
         </>
     )
 }
