@@ -1,0 +1,12 @@
+.welcome{
+    background-color: aqua;
+    height: 100dvh;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    text-align: center;
+}
+.welcomeTitle{
+    font-size: 5rem;
+}

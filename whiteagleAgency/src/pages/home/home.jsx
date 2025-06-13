@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
+import home from "./home.module.css"
 
 export default function Home() {
 
     return (
         <>
-            <div>
+            <div className={home.welcome}>
                 <div>
-                    <h1>Somos WhitEagle</h1>
+                    <h1 className={home.welcomeTitle}>Somos WhitEagle</h1>
                     <p>La mejor alternativa para tu crecimieto</p>
                 </div>
             </div>
