@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import header from "./header.module.css";
-import viteLogo from "../../assets/react.svg";
+import logo from "../../../public/images/logo.svg";
 
 export default function Header() {
   const [login, setLogin] = useState(true);
@@ -13,7 +13,7 @@ export default function Header() {
     <header className={header.header}>
       <div>
         <Link to="/">
-          <img src={viteLogo} alt="Home"  className={header.logo}/>
+          <img src={logo} alt="Home"  className={header.logo}/>
         </Link>
       </div>
       <nav className={header.nav}>

@@ -1,11 +1,11 @@
-import viteLogo from "../../assets/react.svg";
+import logo from "../../../public/images/logo.svg";
 import footer from "./footer.module.css"
 
 export default function Footer() {
 
     return (
         <footer className={footer.footer}>
-            <img src={viteLogo} alt="Home" />
+            <img src={logo} alt="Home" className={footer.logo}/>
             <div>
                 <h2>Contactos</h2>
                 <ul>

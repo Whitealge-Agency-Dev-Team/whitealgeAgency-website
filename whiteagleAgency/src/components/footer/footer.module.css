@@ -1,4 +1,7 @@
 .footer{
     padding: 1rem;
-    background-color: blue;
+    background-color: var(--blue);
+}
+.logo {
+  width: 3rem;
 }
