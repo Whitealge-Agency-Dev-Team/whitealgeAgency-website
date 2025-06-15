@@ -1,9 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import axios from "axios";
 import home from "./home.module.css";
 import image from "../../../public/images/logo.svg";
+import Staff from "../../components/staffCard/Staff";
 
 export default function Home() {
+  const [staff, setStaff] = useState([]);
+
+  useEffect(() => {
+    const fetchStaff = async () => {
+      try {
+        const response = await axios.get("../../../JSON/staff.json");
+        setStaff(response.data);
+      } catch (error) {
+        console.error("Error fetching staff data:", error);
+      }
+    };
+    fetchStaff();
+  }, []);
   return (
     <>
       <div className={home.welcome}>
@@ -69,7 +84,17 @@ export default function Home() {
         </div>
       </section>
       <div>
-        <h1>Nuestro Staff</h1>
+        <h1 className={home.sectionTitle}>Nuestro Staff</h1>
+        <div className={home.staffContainer}>
+          {staff.map((member, index) => (
+            <Staff
+              key={index}
+              name={member.name}
+              assets={member.assets}
+              image={member.image}
+            />
+          ))}
+        </div>
       </div>
     </>
   );

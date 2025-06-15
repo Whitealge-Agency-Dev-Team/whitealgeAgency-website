@@ -1,0 +1,18 @@
+.card{
+    background-color: gray;
+    max-width: 20rem;
+    padding: 2.5rem;
+    align-items: center;
+}
+.name{
+    font-size: 1.5rem;
+}
+.image{
+    width: 8rem;
+}
+.header{
+    text-align: center;
+}
+.assets{
+    font-size: 1.2rem;
+}
