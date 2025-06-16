@@ -1,30 +1,8 @@
-.welcome{
-    background-image: url('../../assets/images/backgroundWelcome.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    height: 100dvh;
-    width: 100%;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    text-align: center;
-}
-.welcomeTitle{
-    font-size: 6rem;
-    margin: 1rem;
-}
-.welcomeSubtitle{
-    font-size: 1.6rem;
-    margin: 1rem;
-}
-.welcomeInfo{
-    color: white;
-    text-shadow: black 0 5px .5rem;
-}
-
 .section{
-    margin: 2rem 3rem 0 3rem;
+    margin: 3rem 3rem 0 3rem;
+}
+.first{
+    margin-top: 12rem;
 }
 .sectionInfo{
     align-items: center;
