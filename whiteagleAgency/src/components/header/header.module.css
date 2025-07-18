@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 .header {
   box-shadow: 0 .2rem 2rem;
   position: fixed;
@@ -8,7 +9,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: var(--blue);
+  /* background-color: var(--blue); */
+  background-color: white;
   z-index: 1000;
   box-sizing: border-box;
 }
@@ -32,8 +34,10 @@
 }
 
 .link {
+  font-family: 'Roboto Slab', sans-serif;
   text-decoration: none;
-  color: white;
+  color: black;
+  font-weight: 450;
   font-size: clamp(1rem, 2vw, 1.2rem);
   transition: color 0.15s ease;
 }
@@ -44,11 +48,13 @@
 
 .button {
   font-size: clamp(0.9rem, 2vw, 1.16rem);
+  font-weight: 450;
+  font-family: 'Roboto Slab', sans-serif;
   padding: 0.5rem 1rem;
-  border-radius: 15px;
+  border-radius: 10px;
   border: none;
   color: white;
-  background-color: #2506d3;
+  background-color: #1257A2;
   cursor: pointer;
   white-space: nowrap;
 }
