@@ -1,0 +1,27 @@
+.section{
+    margin: 3rem 3rem 0 3rem;
+}
+.first{
+    margin-top: 12rem;
+}
+.sectionInfo{
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    gap: 5rem;
+}
+.sectionTitle{
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+}
+.image{
+    width: 20rem;
+}
+.staffContainer{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}
