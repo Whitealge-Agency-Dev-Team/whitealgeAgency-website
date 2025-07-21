@@ -1,7 +1,7 @@
 [
   {
     "name": "Roberto Donato",
-    "image": "../../../public/images/logo.svg",
+    "image": "/images/logo.svg",
     "assets": [
       "Lic. en marketing.",
       "Consultor en marketing estratégico y operativo.",
@@ -11,7 +11,7 @@
   },
   {
     "name": "Sindy Szczucky",
-    "image": "../../../public/images/logo.svg",
+    "image": "/images/logo.svg",
     "assets": [
       "Lic. en marketing.",
       "Analista en marketing estratégico.",
@@ -22,7 +22,7 @@
   },
   {
     "name": "Diego Sánchez",
-    "image": "../../../public/images/logo.svg",
+    "image": "/images/logo.svg",
     "assets": [
       "Lic. en marketing.",
       "Asesor de grupos bancarios.",
@@ -31,14 +31,14 @@
   },
   {
     "name": "Mauro Vazquez",
-    "image": "../../../public/images/logo.svg",
+    "image": "/images/logo.svg",
     "assets": [
       "Coach facilitador de procesos de aprendizaje ontológico, creativo y sistemático."
     ]
   },
   {
     "name": "Sebastian Rey",
-    "image": "../../../public/images/logo.svg",
+    "image": "/images/logo.svg",
     "assets": [
       "Lic. en marketing.",
       "Experiencia en marketing estratégico.",
@@ -47,12 +47,12 @@
   },
   {
     "name": "Luis Eduardo Rodriguez",
-    "image": "../../../public/images/logo.svg",
+    "image": "/images/logo.svg",
     "assets": [
       "Lic. en marketing.",
       "Experiencia en gerencia de laboratorios.",
       "Analista universitario.",
-      "PLanificación operativa de procesos comerciales."
+      "Planificación operativa de procesos comerciales."
     ]
   }
 ]

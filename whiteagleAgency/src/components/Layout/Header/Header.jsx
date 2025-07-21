@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import header from "./header.module.css";
-import logo from "../../../public/images/logo.svg";
+import HeaderCSS from "./header.module.css";
+import logo from "../../../assets/images/logo.svg";
 
 export default function Header() {
   const [login, setLogin] = useState(true);
@@ -10,39 +9,39 @@ export default function Header() {
   const handleLogin = () => setLogin(false);
 
   return (
-    <header className={header.header}>
+    <header className={HeaderCSS.header}>
       <div>
         <Link to="/">
-          <img src={logo} alt="Home"  className={header.logo}/>
+          <img src={logo} alt="Home"  className={HeaderCSS.logo}/>
         </Link>
       </div>
-      <nav className={header.nav}>
-        <ul className={header.list}>
+      <nav className={HeaderCSS.nav}>
+        <ul className={HeaderCSS.list}>
           <li>
-            <Link to={"/services"} className={header.link}>
+            <Link to={"/services"} className={HeaderCSS.link}>
               Servicios
             </Link>
           </li>
           <li>
-            <Link to={"/staff"} className={header.link}>
+            <Link to={"/staff"} className={HeaderCSS.link}>
               Staff
             </Link>
           </li>
           <li>
-            <Link to={"/courses"} className={header.link}>
+            <Link to={"/courses"} className={HeaderCSS.link}>
               Cursos
             </Link>
           </li>
         </ul>
         {login && (
-          <ul className={header.list}>
+          <ul className={HeaderCSS.list}>
             <li>
-              <button onClick={handleLogin} className={header.button}>
+              <button onClick={() => handleLogin()} className={HeaderCSS.button}>
                 Iniciar sesión
               </button>
             </li>
             <li>
-              <button className={header.button}>Registrarse</button>
+              <button className={HeaderCSS.button}>Registrarse</button>
             </li>
           </ul>
         )}

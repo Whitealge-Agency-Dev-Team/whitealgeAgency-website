@@ -1,11 +1,10 @@
 import { Outlet, Link } from 'react-router-dom'
-import Header from "../../components/header/Header"
-import Footer from '../../components/footer/Footer'
-import layout from "./layout.module.css"
+import Header from "../../components/Layout/Header/Header"
+import Footer from '../../components/Layout/Footer/Footer'
 
 export default function Layout() {
     return (
-        <div className={layout.layout}>
+        <div>
             <Header />
             <main>
                 <Outlet />

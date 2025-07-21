@@ -1,11 +1,11 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Layout from "./pages/layout/layout";
-import Home from "./pages/home/home";
-import Staff from "./pages/staff";
-import Services from "./pages/services";
-import CategoryCourses from "./components/courses/Courses"
-import CourseDetail from "./components/courseDetail/courseDetail"
-import NotFound from "./pages/noPage";
+import Layout from "./pages/Layout/Layout";
+import Home from "./pages/Home/Home";
+import Staff from "./pages/Staff/Staff";
+import Services from "./pages/Services/services";
+import Courses from "./pages/Courses/Courses";
+import CourseData from "./pages/Courses/CourseData/CourseData"
+import NoPage from "./pages/NoPage/NoPage";
 
 export default function App() {
   return (
@@ -13,12 +13,12 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="staff" element={<Staff />} />
-          <Route path="services" element={<Services />} />
-          <Route path="/courses" element={<CategoryCourses />} />
-          <Route path="/Curso/:category/:id" element={<CourseDetail />} />
-          <Route path="*" element={<NotFound />} />
+          <Route path="staff/" element={<Staff />} />
+          <Route path="services/" element={<Services />} />
+          <Route path="courses/" element={<Courses/>}/>
+          <Route path="courses/:courseName" element={<CourseData />} />
         </Route>
+        <Route path="*" element={<NoPage />} />
       </Routes>
     </BrowserRouter>
   );
