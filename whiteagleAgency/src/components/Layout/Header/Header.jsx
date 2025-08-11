@@ -12,7 +12,7 @@ export default function Header() {
     <header className={HeaderCSS.header}>
       <div>
         <Link to="/">
-          <img src={logo} alt="Home"  className={HeaderCSS.logo}/>
+          <img src={logo} alt="Home" className={HeaderCSS.logo} />
         </Link>
       </div>
       <nav className={HeaderCSS.nav}>
@@ -36,12 +36,14 @@ export default function Header() {
         {login && (
           <ul className={HeaderCSS.list}>
             <li>
-              <button onClick={() => handleLogin()} className={HeaderCSS.button}>
+              <Link to="/login" className={HeaderCSS.button}>
                 Iniciar sesión
-              </button>
+              </Link>
             </li>
             <li>
-              <button className={HeaderCSS.button}>Registrarse</button>
+              <Link to="/register" className={HeaderCSS.button}>
+                Registrarse
+              </Link>
             </li>
           </ul>
         )}

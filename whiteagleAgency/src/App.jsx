@@ -4,6 +4,8 @@ import Home from "./pages/Home/Home";
 import Staff from "./pages/Staff/Staff";
 import Services from "./pages/Services/services";
 import Courses from "./pages/Courses/Courses";
+import Login from "./pages/Login/Login";
+import Register from "./pages/Register/Register";
 import CourseData from "./pages/Courses/CourseData/CourseData"
 import NoPage from "./pages/NoPage/NoPage";
 
@@ -17,6 +19,8 @@ export default function App() {
           <Route path="services/" element={<Services />} />
           <Route path="courses/" element={<Courses/>}/>
           <Route path="courses/:courseName" element={<CourseData />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
         </Route>
         <Route path="*" element={<NoPage />} />
       </Routes>
