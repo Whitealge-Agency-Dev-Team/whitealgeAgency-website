@@ -35,11 +35,14 @@
   opacity: .8;
 }
 
-.welcomeInfo{
-  transition: all .6s ease;
+.welcomeInfo {
+  opacity: 0;
   text-align: center;
 }
-
-.main-content.scrolled {
-  margin-top: 60vh;
+.welcomeInfo.visible {
+  opacity: 1;
+}
+.welcomeInfo.visible.first-session,
+.welcomeInfo.first-session.visible {
+  transition: opacity 0.6s ease;
 }

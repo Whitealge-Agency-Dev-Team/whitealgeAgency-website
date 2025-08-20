@@ -15,6 +15,7 @@ export default function CourseData() {
     if (foundCourse) {
       setCourse(foundCourse);
       document.title = `${foundCourse.name} - WhitEagle`;
+      window.scrollTo(0, 0)
     } else
       navigate("/404", { replace: true });
   }, [lowerName, navigate]);

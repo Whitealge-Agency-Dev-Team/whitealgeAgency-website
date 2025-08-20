@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 import CourseCardCSS from "./CourseCard.module.css";
 
 export default function CourseCard({ name, description, img }) {
-  const [display, setDisplay] = useState("none");
-  const handleMouseEnter = () => setDisplay("block");
-  const handleMouseLeave = () => setDisplay("none");
+  const [opacity, setOpacity] = useState(0);
+  const handleMouseEnter = () => setOpacity(1);
+  const handleMouseLeave = () => setOpacity(0);
   return (
     <Link to={`/courses/${name.replace(/\s+/g, "_").toLowerCase()}`}>
       <div
@@ -16,7 +16,9 @@ export default function CourseCard({ name, description, img }) {
         onMouseLeave={handleMouseLeave}
       >
         <h1>{name}</h1>
-        <p style={{ display: display }}>{description}</p>
+        <p style={{ opacity: opacity }} className={CourseCardCSS.desc}>
+          {description}
+        </p>
       </div>
     </Link>
   );

@@ -8,7 +8,8 @@ import { useEffect } from "react";
 
 export default function Home() {
   useEffect(() => {
-    document.title = "WhitEagle";
+    document.title = "Inicio - WhitEagle";
+    window.scrollTo(0, 0)
   }, []);
   return (
     <>

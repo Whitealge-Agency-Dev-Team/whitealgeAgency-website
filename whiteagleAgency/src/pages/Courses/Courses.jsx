@@ -6,6 +6,7 @@ import CoursesCSS from "./Courses.module.css";
 export default function Courses() {
   useEffect(() => {
     document.title = "Cursos - WhitEagle";
+    window.scrollTo(0, 0)
   }, []);
   return (
     <div className={CoursesCSS.container}>

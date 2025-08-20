@@ -1,0 +1,25 @@
+.header {
+  display: flex;
+  background-color: var(--blue);
+}
+
+.navbar {
+  width: 100%;
+}
+
+.navlist {
+  display: flex;
+  justify-content: space-around;
+  list-style: none;
+}
+
+.navitem {
+  text-decoration: none;
+  color: antiquewhite;
+  transition: all 0.5s ease;
+}
+
+.navitem:hover {
+  text-decoration: underline;
+  color: aquamarine;
+}
