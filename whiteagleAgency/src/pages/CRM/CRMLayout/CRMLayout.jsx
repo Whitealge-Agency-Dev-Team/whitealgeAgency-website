@@ -21,8 +21,8 @@ function CRMLayout() {
           </ul>
         </nav>
       </header>
-      <main>
-        <h1>Guia de usuario</h1>
+      <main className={CRMLayoutCSS.main}>
+        <h1 className={CRMLayoutCSS.title}>Guia de usuario</h1>
         {guideUserJSON.map((section, index) => {
           return (
             <HomeSection
