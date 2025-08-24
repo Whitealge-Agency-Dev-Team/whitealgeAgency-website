@@ -31,7 +31,6 @@ export default function Login() {
     e.preventDefault();
     if (validateForm()) {
       console.log("Datos de login:", formData);
-      // Aquí mandas a tu backend o API
     }
   };
 
