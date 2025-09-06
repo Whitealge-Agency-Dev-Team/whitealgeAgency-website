@@ -1,5 +1,5 @@
 import { useState } from "react";
-import LoginCSS from "./login.module.css";
+import LoginCSS from "./Login.module.css";
 
 export default function Login() {
   const [formData, setFormData] = useState({
