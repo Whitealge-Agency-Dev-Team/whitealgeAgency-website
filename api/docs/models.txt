@@ -1,0 +1,24 @@
+Estructura de models:
+
+MODEL:
+- CARPETA USER (tablas asociadas a user y ROLES. inspeccionar atributos y valores 
+                de ser necesario. Tal vez debamos hacer triggers/hooks a futuro)
+    - ROLES: lo estipulado el jueves. la tabla RESOURCE representa las tablas en las cuales
+             el rol tendrá permisos. 
+             roleResourcePermission es la tabla de relación.
+- CARPETA PROJECT (asociaciones a PROJECT. Añadí la tabla KEYDATE para fechas importantes:
+                    entregas de proyectos, reuniones, qsy.)
+- CARPETA CLIENT: cliente. Añadí la tabla ENGAGE; solamente es el rubro de la empresa como 
+                    atributo multivaluado.
+- STATUS.js: es una tabla madre donde se guardarán los distintos estados (completado, cancelado, 
+                etc.)
+- MSG.JS: Un helper para los mensajes de error. UN VALIDATE FUERTE NOS EVITARÁ TENER QUE
+COMPROBAR EN LOS ENDPOINTS
+
+INDEX.JS: DESDE ACÁ ACCEDEREMOS A LOS MODELOS PARA LOS ENDPOINTS. EJEMPLO:
+
+const { User, Project } = require("../models/index.js");
+
+
+CUALQUIER DUDA SOBRE ATRIBUTOS Y RELACIONES. REVISAR EL DIAGRAMA DESDE DBEAVER, UNA VEZ 
+CARGADA LA DB

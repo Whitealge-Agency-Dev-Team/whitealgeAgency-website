@@ -1,0 +1,41 @@
+sequelizeErrorHandler: un handler para manejar los errores de los endpoints, apoyados en
+los MENSAJES DE VALIDACIÓN DE LOS MODELOS. Contempla tres escenarios:
+
+- PROBLEMAS DE VALIDACIÓN: mensaje devuelto en res muy EXPLÍCITO (STATUS 422).
+
+- PROBLEMAS DE UNICIDAD: mensaje devuelto en res (STATUS 409)
+
+- CUALQUIER OTRO ESCENARIO: devuelve los detalles del error en RES, pero no es tan explícito.
+REVISAR EL ERROR IMPRESO EN CONSOLA DE SER EL CASO (STATUS 500)
+
+endpointHanlders: 
+OPERACIONES CRUD BÁSICAS PARA FACILITAR EL CREADO DE ENDPOINTS:
+
+- endpointCreate({ model, columnNames, filters  })
+
+- model: el modelo en el que se va a crear un registro. EJEMPLO:
+        endpointCreate({ model: User })
+
+- columnNames: un array de los nombres de las columnas para recuperar los valores 
+                de req.body. EJEMPLO:
+                    endpointCreate({ 
+                        model: User,
+                        columnNames: ["name", "surname", "isActive", "okgfq"],
+                    })
+
+- filters: en caso de tener que devolver información filtrada (passwordHash, por ejemplo)
+            se emplea filters. Caso contrario, no se indica. EJEMPLO:
+                endpointCreate({
+                    model: User,
+                    columnNames: ["name", "surname", "isActive", "ibncsf"],
+                    filters: ["passwordHash"]
+                })
+
+- endpointDelete: solo se pasa MODEL. Se asume que los borrados serán por ID.
+- endpointUpdate: se envía los valores anteriores; mismas consignas.
+- endpointSearch: se envía MODEL y FILTERS. Además, se puede enviar (o no) el atributo 
+                    page y limit para paginado.
+
+
+ADVERTENCIA: estos son endpoints básicos. Antes algún caso más complejo, lo mejor será
+                crear uno desde cero.
