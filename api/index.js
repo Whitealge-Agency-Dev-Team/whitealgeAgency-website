@@ -5,9 +5,13 @@ const cors = require("cors");
 const PORT = 3000;
 const server = express();
 const { authlimiter, apiLimiter } = require('./middlewares/rateLimit/rateLimiting');
-const {validateUser} = require('./middlewares/validation/validateUser');
-const {authRole} = require('./middlewares/authorization/authRole');
-const {authToken} = require('./middlewares/auth/authToken');
+
+// Importar rutas
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+const clientRoutes = require('./routes/clients');
+const projectRoutes = require('./routes/projects');
+
 server.use(express.json());
 
 server.use(
@@ -18,19 +22,25 @@ server.use(
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
-server.use('/register', authlimiter);
-server.use('/login', authlimiter);
-server.use('/', apiLimiter);
 
-//e.g endpoints
-server.post('/register', validateUser, (req, res) => {
-  res.send('user registered!');
+server.use('/auth/register', authlimiter);
+server.use('/auth/login', authlimiter);
+server.use('/api', apiLimiter);
+
+// Usar rutas
+server.use('/auth', authRoutes);
+server.use('/users', userRoutes);
+server.use('/clients', clientRoutes);
+server.use('/projects', projectRoutes);
+
+// Ruta de prueba
+server.get('/clientes', (req, res) => {
+  res.json({ clients: [{ name: "Guillermo", surname: "Francella" }] });
 });
-server.post('/login', validateUser, (req, res) => {
-  res.send('user loged!');
-});
-server.get('/clientes', authToken, authRole('clientes', 'read'), (req, res) => {
-  res.send(`clients: {name: "Guillermo", surname: "Francella"}`);
+
+// Ruta de salud (healthy route)
+server.get('/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Servidor funcionando correctamente' });
 });
 
 sequelize

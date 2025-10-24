@@ -2,19 +2,23 @@ require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
 const authToken = (req, res, next) => {
-  const tokenCoded = req.headers["authorization"];
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
 
-  if (!tokenCoded)
-    res.json({
+  if (!token) {
+    return res.status(401).json({
       message: "Credenciales no válidas",
       status: 401,
     });
+  }
+
   try {
-    const response = jwt.verify(verifyToken, process.env.JWY_SECRET);
-    req.user = response;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Cambié JWY_SECRET por JWT_SECRET
+    req.user = decoded;
     next();
   } catch (err) {
     console.error("Error al verificar el token: " + err.message);
+    return res.status(403).json({ message: "Token inválido" });
   }
 };
 
