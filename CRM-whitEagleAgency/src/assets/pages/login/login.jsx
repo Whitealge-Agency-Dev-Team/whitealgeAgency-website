@@ -1,25 +1,62 @@
-import './login.css'
+import { useState } from 'react';
+import './login.css';
 
 export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('http://localhost:5173/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || 'Error al iniciar sesión');
+
+      localStorage.setItem('token', data.token);
+      alert('Login exitoso');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="login-wrapper">
-      <div className="login-box">
-        <h2 className="login-header">Inicio de sesion</h2>
-
-        <form className="login-form">
-          <div className="field">
-            <label htmlFor="email">Correo</label>
-            <input type="email" id="email" placeholder="tucorreo@ejemplo.com" required />
-          </div>
-
-          <div className="field">
-            <label htmlFor="password">Contraseña</label>
-            <input type="password" id="password" placeholder="••••••••" required />
-          </div>
-
-          <button type="submit" className="btn-login">Entrar</button>
+    <div className="login-container">
+      <div className="login-card">
+        <h1>Iniciar Sesión</h1>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          {error && <p className="error">{error}</p>}
+          <button type="submit" disabled={loading}>
+            {loading ? 'Entrando...' : 'Ingresar'}
+          </button>
         </form>
       </div>
     </div>
-  )
+  );
 }
