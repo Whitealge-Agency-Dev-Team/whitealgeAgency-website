@@ -1,0 +1,25 @@
+.content-section {
+  width: 1000px;
+  height: 740px;
+  background-color: rgb(35, 63, 109);
+  border-radius: 0 0 15px 0;
+}
+
+p {
+  margin: 0;
+  color: white;
+}
+
+label {
+  display: grid;
+}
+.content-information {
+  padding: 20%;
+}
+#pass{
+    margin: 20px;
+    margin-left: 180px;
+    width: 40%;
+    display:grid;
+    background-color: rgb(22, 38, 63);
+}

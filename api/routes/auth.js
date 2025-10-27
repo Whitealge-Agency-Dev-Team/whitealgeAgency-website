@@ -111,10 +111,7 @@ router.post("/register-client", authToken, async (req, res) => {
   }
 });
 
-//Federico, fijate de que coincidan con los /me que hiciste, no los encontré, [F]
-
 // Perfil del usuario
-/*
 router.get("/me", authToken, async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
@@ -132,14 +129,12 @@ router.get("/me", authToken, async (req, res) => {
     res.status(500).json({ message: "Error al obtener perfil" });
   }
 });
-*/
 // Actualizar perfil propio
-/*router.put("/me", authToken, async (req, res) => {
+router.put("/upload_me", authToken, async (req, res) => {
   try {
     const { name, surname, phoneNumber, email } = req.body;
     const allowedFields = { name, surname, phoneNumber, email };
     
-    // Limpiar campos undefined
     Object.keys(allowedFields).forEach(key => {
       if (allowedFields[key] === undefined) {
         delete allowedFields[key];
@@ -153,6 +148,6 @@ router.get("/me", authToken, async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Error al actualizar perfil" });
   }
-});*/
+});
 
 module.exports = router;
