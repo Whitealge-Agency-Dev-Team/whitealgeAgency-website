@@ -1,5 +1,6 @@
 import Profile from './sectionsLayout/profile.jsx';
 import Team from './sectionsLayout/team.jsx';
+import Login from '../login/login.jsx';
 import Security from './sectionsLayout/security.jsx';
 import "./Layout.css";
 import { useState } from 'react';
@@ -8,6 +9,7 @@ export default function Layout() {
   const [some, setSome] = useState(<Profile/>);
   const handleSection = (e) => {
     
+    if (e.target.getAttribute('data-value') == 'login') return setSome(<Login/>);
     if (e.target.getAttribute('data-value') == 'profile') return setSome(<Profile/>);
     if (e.target.getAttribute('data-value') == 'team') return setSome(<Team/>);
     if (e.target.getAttribute('data-value') == 'security') return setSome(<Security/>);
