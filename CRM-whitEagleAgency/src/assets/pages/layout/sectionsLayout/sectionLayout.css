@@ -14,7 +14,7 @@ label {
   display: grid;
 }
 .content-information {
-  padding: 20%;
+  padding: 5%;
 }
 #pass{
     margin: 20px;
@@ -22,4 +22,25 @@ label {
     width: 40%;
     display:grid;
     background-color: rgb(22, 38, 63);
+}
+
+.member-img
+{
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  padding: 5%;
+}
+
+.content-members{
+  display: flex;
+  justify-content:center;
+  column-width: 100px;
+   -moz-column-width: 300px;
+    -webkit-column-width: 300px;
+}
+
+.member
+{
+  margin: 3%;
 }
