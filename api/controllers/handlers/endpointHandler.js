@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
 const sequelizeError = require("./sequelizeErrorHandler");
 
-const endpointCreate = async ({ model, columnNames = [], filters = [] }) => {
+const endpointCreate =  ({ model, columnNames = [], filters = [] }) => {
   return async (req, res) => {
     try {
       const toCreate = {};
@@ -37,7 +37,7 @@ const endpointCreate = async ({ model, columnNames = [], filters = [] }) => {
   };
 };
 
-const endpointDelete = async ({ model }) => {
+const endpointDelete =  ({ model }) => {
   return async (req, res) => {
     try {
       const { id } = req.params;
@@ -61,7 +61,7 @@ const endpointDelete = async ({ model }) => {
   };
 };
 
-const endpointUpdate = async ({ model, columnNames = [], filters = [] }) => {
+const endpointUpdate =  ({ model, columnNames = [], filters = [] }) => {
   return async (req, res) => {
     try {
       const { id } = req.params;
@@ -104,7 +104,7 @@ const endpointUpdate = async ({ model, columnNames = [], filters = [] }) => {
   };
 };
 
-const endpointSearch = async ({
+const endpointSearch = ({
   model,
   filters = [],
   page = 1,
@@ -207,3 +207,5 @@ const endpointSearch = async ({
     }
   };
 };
+
+module.exports = {endpointCreate, endpointDelete, endpointSearch, endpointUpdate}

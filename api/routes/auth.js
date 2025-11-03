@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { User, Role, Client } = require("../models/index");
-const { validateUser } = require("../middlewares/validation/validateUser");
+// const { validateUser } = require("../middlewares/validation/validateUser");
 const { authToken } = require("../middlewares/auth/authToken");
 
 // Login (se puede remover, ya que había otro en funcionamiento)
@@ -52,7 +52,7 @@ router.post("/login", async (req, res) => {
 });
 
 // Registrar trabajador (solo admin/team_manager)
-router.post("/register-worker", authToken, async (req, res) => {
+router.post("/register-worker", async (req, res) => {
   try {
     const { email, phoneNumber, name, surname, password, roleId } = req.body;
     
@@ -123,7 +123,7 @@ router.get("/me", authToken, async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
     
-    res.json({ user });
+    res.json({user});
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error al obtener perfil" });

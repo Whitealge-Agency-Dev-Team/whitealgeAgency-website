@@ -17,11 +17,6 @@ const User = sequelize.define(
     phoneNumber: {
       type: DataTypes.STRING(15),
       allowNull: false,
-      validate: {
-        max: { args: 15, msg: MSG.max("Número de teléfono", 15) },
-        isNumeric: { msg: MSG.numeric("Número de teléfono") },
-        notEmpty: { msg: MSG.required("Número de teléfono") },
-      },
     },
     isActive: {
       type: DataTypes.BOOLEAN,

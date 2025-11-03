@@ -12,7 +12,7 @@ router.post("/public-form", endpointCreate({
 }));
 
 // Endpoints protegidos
-router.use(authToken);
+// router.use(authToken);
 
 // CLIENTES
 router.get("/", authRole("clients", "read"), endpointSearch({
