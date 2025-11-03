@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Grid, Paper, Avatar, Typography, Divider } from '@mui/material';
 
 // Datos de ejemplo para los miembros
@@ -20,10 +19,9 @@ export default function Team() {
         Sos el gerente del equipo
       </Typography>
 
-      {/* Grid responsivo: 1 col en móvil (xs), 2 en tablet (sm), 3 en desktop (md) */}
       <Grid container spacing={2} sx={{ my: 2 }}>
         {members.map((member) => (
-          <Grid item xs={12} sm={6} md={4} key={member.name}>
+          <Grid key={member.name}>
             <Paper 
               elevation={2} 
               sx={{ 
@@ -42,7 +40,6 @@ export default function Team() {
 
       <Divider sx={{ my: 4 }} />
 
-      {/* Sección de Proyectos */}
       <Box>
         <Typography variant="h6" gutterBottom>
           Project: Lorem, ipsum.

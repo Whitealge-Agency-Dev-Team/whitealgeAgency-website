@@ -1,77 +1,83 @@
 import { Box, Grid, TextField, Button, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 
 export default function Profile() {
+  const [usuario, setUsuario] = useState({ email: "", fname: "", surname: "", phone: "", roleId: "", });
+
+  async function Fetching() {
+    const response = await fetch("http://localhost:3000/auth/me", {
+      method: "GET",
+      headers: { "authorization": "Barer añadir_token_aca" }
+    });
+    const data = await response.json();
+    setUsuario({ ...usuario, email: `${data.user.email}`, fname: `${data.user.name}`, surname: `${data.user.surname}`, phone: `${data.user.phoneNumber}`, roleId: `${data.user.roleId}` });
+  }
+  useEffect(() => { Fetching() }, []);
+
   return (
     <Box component="form" noValidate autoComplete="off">
       <Typography variant="h5" gutterBottom>
         Editar Perfil
       </Typography>
-      
-      {/* Grid responsivo: 2 columnas en desktop (sm={6}), 1 en móvil (xs={12}) */}
+
       <Grid container spacing={3} sx={{ mt: 1 }}>
-        <Grid item xs={12} sm={6}>
+        <Grid>
           <TextField
             fullWidth
-            label="Nombre"
             name="name"
             id="name"
-            defaultValue="lorem"
+            defaultValue={usuario.fname}
             variant="outlined"
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid>
           <TextField
             fullWidth
-            label="Apellido"
             name="surname"
             id="surname"
-            defaultValue="ipsum"
+            defaultValue={usuario.surname}
             variant="outlined"
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid>
           <TextField
             fullWidth
-            label="Número de teléfono"
             type="number"
             name="phone"
             id="phone"
-            defaultValue={1135231122}
+            defaultValue={usuario.phone}
             variant="outlined"
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid>
           <TextField
             fullWidth
-            label="Email"
             type="email"
             name="email"
             id="email"
-            defaultValue="Lorem@gmail.com"
+            defaultValue={usuario.email}
             variant="outlined"
           />
         </Grid>
-        <Grid item xs={12}>
-          {/* Botón de carga de archivos (sin ícono) */}
+        <Grid >
           <Button
             variant="outlined"
-            component="label" // Actúa como un <label>
+            component="label"
           >
             Subir nueva imagen
             <input
               type="file"
-              hidden // El input real está oculto
+              hidden
               name="img"
               id="img"
             />
           </Button>
         </Grid>
-        <Grid item xs={12} sx={{ textAlign: 'right' }}>
-          {/* Botón de guardado (sin ícono) */}
-          <Button 
-            variant="contained" 
-            sx={{ 
-              bgcolor: 'primary.main' 
+        <Grid sx={{ textAlign: 'right' }}>
+          <Button
+            variant="contained"
+            sx={{
+              bgcolor: 'primary.main'
             }}
           >
             Guardar Cambios

@@ -1,4 +1,4 @@
-import { Box, TextField, Button, Typography, Alert } from '@mui/material';
+import { Box, TextField, Button, Typography, Alert, Grid } from '@mui/material';
 
 export default function Security() {
   return (
@@ -9,50 +9,61 @@ export default function Security() {
       <Typography variant="subtitle1" color="text.secondary" gutterBottom>
         Actualizar tu contraseña
       </Typography>
-
       <Box 
         component="form" 
+        noValidate 
+        autoComplete="off"
         sx={{
-          mt: 3,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 3, // Espacio entre cada campo
-          maxWidth: 'sm' // Ancho máximo para el formulario
+          mt: 3, 
         }}
       >
-        <TextField
-          label="Correo electrónico"
-          type="email"
-          name="email"
-          id="email"
-          value="Lorem@gmail.com"
-          disabled // El email no se puede cambiar
-          fullWidth
-        />
-        <TextField
-          label="Contraseña Actual"
-          type="password"
-          name="current-password"
-          id="current-password"
-          fullWidth
-        />
-        <TextField
-          label="Nueva Contraseña"
-          type="password"
-          name="new-password"
-          id="new-password"
-          fullWidth
-        />
+        <Grid container spacing={3}>
+          
+          <Grid>
+            <TextField
+              label="Correo electrónico"
+              type="email"
+              name="email"
+              id="email"
+              value="Lorem@gmail.com"
+              disabled 
+              fullWidth 
+            />
+          </Grid>
+          
+          <Grid>
+            <TextField
+              label="Contraseña Actual"
+              type="password"
+              name="current-password"
+              id="current-password"
+              fullWidth
+            />
+          </Grid>
+          
+          <Grid>
+            <TextField
+              label="Nueva Contraseña"
+              type="password"
+              name="new-password"
+              id="new-password"
+              fullWidth
+            />
+          </Grid>
 
-        <Alert severity="info" sx={{ mt: 1 }}>
-          La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.
-        </Alert>
+          <Grid>
+            <Alert severity="info">
+              La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.
+            </Alert>
+          </Grid>
 
-        <Box sx={{ textAlign: 'right' }}>
-          <Button variant="contained" sx={{ bgcolor: 'primary.main' }}>
-            Actualizar Contraseña
-          </Button>
-        </Box>
+          <Grid x={{ textAlign: 'right' }}>
+            <Button variant="contained" sx={{ bgcolor: 'primary.main' }}>
+              Actualizar Contraseña
+            </Button>
+          </Grid>
+          
+        </Grid>
       </Box>
     </Box>
   );
