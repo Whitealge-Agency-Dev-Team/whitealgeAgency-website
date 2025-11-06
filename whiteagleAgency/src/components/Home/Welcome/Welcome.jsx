@@ -40,7 +40,7 @@ export default function WelcomeSection() {
           (firstSession ? " first-session" : "")
         }
       >
-        <h1 className="title">Somos WhitEalge</h1>
+        <h1 className="title" style={{color: "white"}}>Somos WhitEagle</h1>
         <p className="subtitle">La mejor alternativa para tu crecimiento</p>
       </div>
     </div>

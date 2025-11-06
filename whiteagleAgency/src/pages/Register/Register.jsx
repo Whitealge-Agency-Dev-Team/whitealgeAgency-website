@@ -10,6 +10,7 @@ export default function Register() {
     rubro: "",
     role: "",
     companyName: "",
+    problematic: ""
   });
 
   const [errors, setErrors] = useState({});
@@ -57,7 +58,7 @@ export default function Register() {
   return (
     <div id="registerPag">
       <div className={RegisterCSS.container}>
-        <h1>Registro de Usuario</h1>
+        <h1>Completá el formulario</h1>
         <form onSubmit={handleSubmit} className={RegisterCSS.form}>
           <label>
             Correo electrónico:
@@ -141,8 +142,21 @@ export default function Register() {
               <p className={RegisterCSS.error}>{errors.companyName}</p>
             )}
           </label>
+          <label>
+            Describa su problemática:
+            <input
+              type="text"
+              name="problematic"
+              value={formData.problematic}
+              onChange={handleChange}
+              style={{width:"440px", height: "140px"}}
+            />
+            {errors.companyName && (
+              <p className={RegisterCSS.error}>{errors.companyName}</p>
+            )}
+          </label>
 
-          <button type="submit">Registrarse</button>
+          <button type="submit">Enviar formulario</button>
         </form>
       </div>
     </div>

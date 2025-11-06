@@ -23,9 +23,9 @@ export default function Header() {
             </Link>
           </li>
           <li>
-            <Link to={"/staff"} className={HeaderCSS.link}>
+            {/* <Link to={"/staff"} className={HeaderCSS.link}>
               Staff
-            </Link>
+            </Link> */}
           </li>
           <li>
             <Link to={"/courses"} className={HeaderCSS.link}>
@@ -42,7 +42,7 @@ export default function Header() {
             </li>
             <li>
               <Link to="/register" className={HeaderCSS.button}>
-                Registrarse
+                Formulario de consulta
               </Link>
             </li>
           </ul>

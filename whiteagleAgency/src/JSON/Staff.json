@@ -29,13 +29,7 @@
       "Desarrollador de cartera, intangibles financieros en el mercado."
     ]
   },
-  {
-    "name": "Mauro Vazquez",
-    "image": "/images/logo.svg",
-    "assets": [
-      "Coach facilitador de procesos de aprendizaje ontológico, creativo y sistemático."
-    ]
-  },
+
   {
     "name": "Sebastian Rey",
     "image": "/images/logo.svg",
@@ -43,16 +37,6 @@
       "Lic. en marketing.",
       "Experiencia en marketing estratégico.",
       "Analista de pronósticos operativos."
-    ]
-  },
-  {
-    "name": "Luis Eduardo Rodriguez",
-    "image": "/images/logo.svg",
-    "assets": [
-      "Lic. en marketing.",
-      "Experiencia en gerencia de laboratorios.",
-      "Analista universitario.",
-      "Planificación operativa de procesos comerciales."
     ]
   }
 ]

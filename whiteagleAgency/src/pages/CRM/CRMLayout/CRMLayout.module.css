@@ -6,17 +6,9 @@
   background-color: var(--blue);
   position: fixed;
 }
-.main{
-  margin-top: 6rem;
-}
-.title{
-  font-size: 3rem;
-}
-
 .navbar {
   width: 100%;
 }
-
 .navlist {
   display: flex;
   justify-content: space-around;
