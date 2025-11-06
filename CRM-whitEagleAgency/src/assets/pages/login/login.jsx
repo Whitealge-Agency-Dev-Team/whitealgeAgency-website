@@ -4,33 +4,20 @@ import './login.css';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      const res = await fetch('http://localhost:5173/api/auth/login', {
+      const res = await fetch('http://localhost:3000/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
-
       const data = await res.json();
-
-      if (!res.ok) throw new Error(data.message || 'Error al iniciar sesión');
-
+      console.log(data.token);
+      
       localStorage.setItem('token', data.token);
-      alert('Login exitoso');
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+      window.location.href = "http://localhost:5173/homez";      
+    };
 
   return (
     <div className="login-container">
@@ -51,9 +38,8 @@ export default function Login() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          {error && <p className="error">{error}</p>}
-          <button type="submit" disabled={loading}>
-            {loading ? 'Entrando...' : 'Ingresar'}
+          <button type="submit">
+            Enviar
           </button>
         </form>
       </div>

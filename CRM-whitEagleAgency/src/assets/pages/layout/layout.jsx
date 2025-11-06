@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
-import Profile from './sectionsLayout/profile.jsx';
-import Team from './sectionsLayout/team.jsx';
-import Security from './sectionsLayout/security.jsx';
-
-import { Box, Paper, Avatar, Typography, Tabs, Tab } from '@mui/material';
-
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Profile from "./sectionsLayout/profile.jsx";
+import Team from "./sectionsLayout/team.jsx";
+import Security from "./sectionsLayout/security.jsx";
+import { Box, Paper, Avatar, Typography, Tabs, Tab, Button } from "@mui/material";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -16,11 +15,7 @@ function TabPanel(props) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: { xs: 2, sm: 3 } }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: { xs: 2, sm: 3 } }}>{children}</Box>}
     </div>
   );
 }
@@ -28,22 +23,40 @@ function TabPanel(props) {
 function a11yProps(index) {
   return {
     id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
   };
 }
 
 export default function Layout() {
+  const navigate = useNavigate();
   const [value, setValue] = useState(0);
-  const [usuario, setUsuario] = useState({ email: "", fname: "", surname: "", phone: "", roleId: "", });
+  const [usuario, setUsuario] = useState({
+    email: "",
+    fname: "",
+    surname: "",
+    phone: "",
+    roleId: "",
+  });
+  const token = localStorage.getItem("token");
+
   async function Fetching() {
     const response = await fetch("http://localhost:3000/auth/me", {
       method: "GET",
-      headers: { "authorization": "Barer añadir_token_aca" }
+      headers: { authorization: `Barer ${token}` },
     });
     const data = await response.json();
-    setUsuario({ ...usuario, email: `${data.user.email}`, fname: `${data.user.name}`, surname: `${data.user.surname}`, phone: `${data.user.phoneNumber}`, roleId: `${data.user.roleId}` });
+    setUsuario({
+      ...usuario,
+      email: `${data.user.email}`,
+      fname: `${data.user.name}`,
+      surname: `${data.user.surname}`,
+      phone: `${data.user.phoneNumber}`,
+      roleId: `${data.user.roleId}`,
+    });
   }
-  useEffect(() => { Fetching() }, [])
+  useEffect(() => {
+    Fetching();
+  }, []);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -52,24 +65,26 @@ export default function Layout() {
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: { xs: 'column', md: 'row' },
-        minHeight: '100vh',
-        bgcolor: '#f4f6f8'
+        display: "flex",
+        flexDirection: { xs: "column", md: "row" },
+        minHeight: "100vh",
+        bgcolor: "#f4f6f8",
       }}
     >
-
+      <Button variant="text" onClick={() => navigate(-1)} sx={{ mb: 2 }}>
+        ← Volver
+      </Button>
       <Paper
         elevation={3}
         sx={{
-          width: { xs: '100%', md: 300 },
-          bgcolor: 'background.paper',
-          height: { xs: 'auto', md: '100vh' },
+          width: { xs: "100%", md: 300 },
+          bgcolor: "background.paper",
+          height: { xs: "auto", md: "100vh" },
           p: 3,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          borderRight: { md: '1px solid #e0e0e0' }
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          borderRight: { md: "1px solid #e0e0e0" },
         }}
       >
         <Avatar
@@ -78,7 +93,7 @@ export default function Layout() {
           sx={{ width: 100, height: 100, mb: 2 }} // mb = margin-bottom
         />
         <Typography variant="h6" gutterBottom>
-          {usuario.name}, {usuario.surname}
+          {usuario.fname}, {usuario.surname}
         </Typography>
         <Typography variant="body2" color="text.secondary">
           {usuario.email}
@@ -91,10 +106,16 @@ export default function Layout() {
       <Box
         sx={{
           flexGrow: 1, // Ocupa el resto del espacio
-          p: { xs: 1, sm: 2, md: 3 } // Padding responsivo
+          p: { xs: 1, sm: 2, md: 3 }, // Padding responsivo
         }}
       >
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
+        <Box
+          sx={{
+            borderBottom: 1,
+            borderColor: "divider",
+            bgcolor: "background.paper",
+          }}
+        >
           <Tabs
             value={value}
             onChange={handleChange}
@@ -120,7 +141,6 @@ export default function Layout() {
           </TabPanel>
         </Paper>
       </Box>
-
     </Box>
   );
 }

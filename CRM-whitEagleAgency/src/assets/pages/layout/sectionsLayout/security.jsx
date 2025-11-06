@@ -1,6 +1,19 @@
 import { Box, TextField, Button, Typography, Alert, Grid } from '@mui/material';
+import { useState, useEffect } from 'react';
 
 export default function Security() {
+  const token = localStorage.getItem('token');
+  const [email, setEmail] = useState('');
+  async function Fetching() {
+      const response = await fetch("http://localhost:3000/auth/me", {
+        method: "GET",
+        headers: { "authorization": `Barer ${token}` }
+      });
+      const data = await response.json();
+      setEmail(data.user.email);
+    }
+    useEffect(() => { Fetching() }, [])
+
   return (
     <Box>
       <Typography variant="h5" gutterBottom>
@@ -25,7 +38,7 @@ export default function Security() {
               type="email"
               name="email"
               id="email"
-              value="Lorem@gmail.com"
+              value={email}
               disabled 
               fullWidth 
             />
