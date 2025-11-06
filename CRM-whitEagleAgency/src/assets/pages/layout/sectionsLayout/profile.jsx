@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react';
 
 export default function Profile() {
   const [usuario, setUsuario] = useState({ email: "", fname: "", surname: "", phone: "", roleId: "", });
-
+  const token = localStorage.getItem('token');
   async function Fetching() {
     const response = await fetch("http://localhost:3000/auth/me", {
       method: "GET",
-      headers: { "authorization": "Barer añadir_token_aca" }
+      headers: { "authorization": `Barer ${token}`}
     });
     const data = await response.json();
     setUsuario({ ...usuario, email: `${data.user.email}`, fname: `${data.user.name}`, surname: `${data.user.surname}`, phone: `${data.user.phoneNumber}`, roleId: `${data.user.roleId}` });

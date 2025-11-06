@@ -5,7 +5,7 @@ const cors = require("cors");
 const PORT = 3000;
 const server = express();
 const { authlimiter, apiLimiter } = require('./middlewares/rateLimit/rateLimiting');
-
+const {defaultUser} = require('./helpers/defaultUser');
 // Importar rutas
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
@@ -23,7 +23,7 @@ server.use(
   })
 );
 
-server.use('/auth/register', authlimiter);
+server.use('/auth//register-worker', authlimiter);
 server.use('/auth/login', authlimiter);
 server.use('/api', apiLimiter);
 
@@ -32,11 +32,6 @@ server.use('/auth', authRoutes);
 server.use('/users', userRoutes);
 server.use('/clients', clientRoutes);
 server.use('/projects', projectRoutes);
-
-// Ruta de prueba
-server.get('/clientes', (req, res) => {
-  res.json({ clients: [{ name: "Guillermo", surname: "Francella" }] });
-});
 
 // Ruta de salud (healthy route)
 server.get('/health', (req, res) => {
@@ -47,8 +42,8 @@ sequelize
   .sync({ force: false })
   .then(() => {
     console.log("Base de datos iniciada con éxito");
-    server.listen(PORT, () =>
-      console.log(`Servidor corriendo en: http://localhost:${PORT}`)
+    server.listen(PORT, async () =>
+      await defaultUser()      
     );
   })
   .catch((error) => console.log("Error: ", error));

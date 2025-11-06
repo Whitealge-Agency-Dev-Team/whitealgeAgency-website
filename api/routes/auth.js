@@ -14,7 +14,7 @@ router.post("/login", async (req, res) => {
       where: { email },
       include: [{ model: Role }]
     });
-
+    
     if (!user) {
       return res.status(401).json({ message: "Credenciales inválidas" });
     }
@@ -28,7 +28,6 @@ router.post("/login", async (req, res) => {
       { 
         id: user.id, 
         email: user.email, 
-        role: user.Role.name || user.Role.code,
         roleId: user.roleId 
       },
       process.env.JWT_SECRET,
@@ -42,7 +41,7 @@ router.post("/login", async (req, res) => {
         email: user.email,
         name: user.name,
         surname: user.surname,
-        role: user.Role.name || user.Role.code
+        role_id: user.roleId 
       }
     });
   } catch (error) {
