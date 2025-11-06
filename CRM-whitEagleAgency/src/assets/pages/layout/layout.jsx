@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Profile from './sectionsLayout/profile.jsx';
 import Team from './sectionsLayout/team.jsx';
+import Login from '../login/login.jsx';
 import Security from './sectionsLayout/security.jsx';
 
 import { Box, Paper, Avatar, Typography, Tabs, Tab } from '@mui/material';

@@ -6,50 +6,7 @@ const { User, Role, Client } = require("../models/index");
 // const { validateUser } = require("../middlewares/validation/validateUser");
 const { authToken } = require("../middlewares/auth/authToken");
 
-// Login (se puede remover, ya que había otro en funcionamiento)
-router.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ 
-      where: { email },
-      include: [{ model: Role }]
-    });
-
-    if (!user) {
-      return res.status(401).json({ message: "Credenciales inválidas" });
-    }
-
-    const validPassword = await bcrypt.compare(password, user.passwordHash);
-    if (!validPassword) {
-      return res.status(401).json({ message: "Credenciales inválidas" });
-    }
-
-    const token = jwt.sign(
-      { 
-        id: user.id, 
-        email: user.email, 
-        role: user.Role.name || user.Role.code,
-        roleId: user.roleId 
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "24h" }
-    );
-
-    res.json({
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        surname: user.surname,
-        role: user.Role.name || user.Role.code
-      }
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error interno del servidor" });
-  }
-});
+// Login (se puede remover, ya que había otro en funcionamiento
 
 // Registrar trabajador (solo admin/team_manager)
 router.post("/register-worker", async (req, res) => {
