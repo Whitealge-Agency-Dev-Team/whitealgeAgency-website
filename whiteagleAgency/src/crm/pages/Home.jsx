@@ -28,7 +28,7 @@ export default function CRMHome() {
     <div>
       <Toolbar />
       <List>
-        {[{ label: 'Clientes', to: '/crm/clientes' }, { label: 'Proyectos', to: '/crm/proyectos' }].map((item) => (
+        {[{ label: 'Clientes', to: '/crm/clientes' }, { label: 'Proyectos', to: '/crm/proyectos' }, { label: 'Organigrama', to: '/crm/organigrama' }].map((item) => (
           <ListItemButton key={item.label} component={Link} to={item.to}>
             <ListItemText primary={item.label} />
           </ListItemButton>

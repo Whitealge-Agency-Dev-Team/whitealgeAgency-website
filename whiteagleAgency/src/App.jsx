@@ -22,6 +22,8 @@ import Contact from "./pages/Contact/Contact.jsx";
 import ClientDetail from "./crm/pages/ClientDetail.jsx";
 import ProjectDetail from "./crm/pages/ProjectDetail.jsx";
 import InviteWorker from "./crm/pages/InviteWorker.jsx";
+import CRMChart from "./crm/pages/ChartOrganization.jsx";
+
 
 export default function App() {
   return (
@@ -44,6 +46,7 @@ export default function App() {
           <Route path="set-password" element={<SetPassword />} />
           <Route element={<ProtectedRoute />}> 
             <Route path="home" element={<CRMHome />} />
+            <Route path="organigrama" element={<CRMChart />} />
             <Route path="profile" element={<CRMProfile />} />
             <Route path="clientes" element={<CRMClients />} />
             <Route path="clientes/:id" element={<ClientDetail />} />
