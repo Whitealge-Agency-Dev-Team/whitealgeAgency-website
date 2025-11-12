@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const { User, Role, Client } = require("../models/index");
 // const { validateUser } = require("../middlewares/validation/validateUser");
 const { authToken } = require("../middlewares/auth/authToken");
+const { authRole } = require("../middlewares/authorization/authRole");
 
 // Login (se puede remover, ya que había otro en funcionamiento)
 router.post("/login", async (req, res) => {
@@ -28,7 +29,8 @@ router.post("/login", async (req, res) => {
       { 
         id: user.id, 
         email: user.email, 
-        roleId: user.roleId 
+        roleId: user.roleId,
+        role: user.Role ? user.Role.code : undefined
       },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
@@ -41,7 +43,8 @@ router.post("/login", async (req, res) => {
         email: user.email,
         name: user.name,
         surname: user.surname,
-        role_id: user.roleId 
+        role_id: user.roleId,
+        role: user.Role ? user.Role.code : undefined
       }
     });
   } catch (error) {
@@ -50,30 +53,38 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Registrar trabajador (solo admin/team_manager)
-router.post("/register-worker", async (req, res) => {
+// Invitación a trabajador (admin/owner/organizer)
+router.post("/invite-worker", authToken, authRole("users", "create"), async (req, res) => {
   try {
-    const { email, phoneNumber, name, surname, password, roleId } = req.body;
-    
-    const hashedPassword = await bcrypt.hash(password, 12);
-    
+    const { email, phoneNumber = '', name = '', surname = '', roleCode = 'W' } = req.body;
+
+    const role = await Role.findOne({ where: { code: roleCode.toUpperCase() } });
+    if (!role) return res.status(400).json({ message: "Código de rol inválido" });
+
+    // Generar token de set-password y contraseña temporal aleatoria
+    const tempPassword = Math.random().toString(36).slice(-10);
+    const hashedPassword = await bcrypt.hash(tempPassword, 12);
+
     const user = await User.create({
       email,
       phoneNumber,
       name,
       surname,
       passwordHash: hashedPassword,
-      roleId,
+      roleId: role.id,
       isActive: true
     });
 
-    res.status(201).json({ 
-      message: "Trabajador creado exitosamente",
-      userId: user.id 
-    });
+    const setPassToken = jwt.sign({ type: 'set_password', id: user.id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    const FRONT_URL = process.env.FRONT_URL || 'http://localhost:5173';
+    const link = `${FRONT_URL}/crm/set-password?token=${setPassToken}`;
+
+    console.log(`[INVITE] Enviar a ${email}: Estás invitado al CRM. Establece tu contraseña aquí: ${link}`);
+
+    res.status(201).json({ message: "Invitación enviada (consola)", userId: user.id });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error al crear trabajador" });
+    res.status(500).json({ message: "Error al invitar trabajador" });
   }
 });
 
@@ -83,7 +94,7 @@ router.post("/register-client", authToken, async (req, res) => {
     const { email, name, surname, clientId } = req.body;
     
     const clientRole = await Role.findOne({ where: { code: 'C' } }); // C de cliente
-    const tempPassword = Math.random().toString(36).slice(-8);
+    const tempPassword = Math.random().toString(36).slice(-10);
     
     const hashedPassword = await bcrypt.hash(tempPassword, 12);
     
@@ -96,13 +107,15 @@ router.post("/register-client", authToken, async (req, res) => {
       isActive: true
     });
 
-    // mail con las credenciales
-    console.log(`Credenciales para ${email}: ${tempPassword}`);
+    // Enviar link de set-password (consola)
+    const setPassToken = jwt.sign({ type: 'set_password', id: user.id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+    const FRONT_URL = process.env.FRONT_URL || 'http://localhost:5173';
+    const link = `${FRONT_URL}/crm/set-password?token=${setPassToken}`;
+    console.log(`[INVITE] Cliente aceptado ${email}. Establece tu contraseña aquí: ${link}`);
 
     res.status(201).json({ 
-      message: "Cliente registrado exitosamente",
-      userId: user.id,
-      tempPassword // Solo para dev, en main no enviar
+      message: "Cliente registrado exitosamente (invitación en consola)",
+      userId: user.id
     });
   } catch (error) {
     console.error(error);
@@ -146,6 +159,56 @@ router.put("/upload_me", authToken, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error al actualizar perfil" });
+  }
+});
+
+// Establecer contraseña con token de invitación
+router.post("/set-password", async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword) return res.status(400).json({ message: "Token y nueva contraseña son requeridos" });
+
+    let payload;
+    try {
+      payload = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (e) {
+      return res.status(400).json({ message: "Token inválido o expirado" });
+    }
+
+    if (payload.type !== 'set_password' || !payload.id) {
+      return res.status(400).json({ message: "Token inválido" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    await User.update({ passwordHash: hashedPassword }, { where: { id: payload.id } });
+
+    return res.json({ message: "Contraseña actualizada exitosamente" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error al establecer la contraseña" });
+  }
+});
+
+// Cambiar contraseña (usuario autenticado)
+router.post('/change-password', authToken, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) return res.status(400).json({ message: 'La contraseña actual y la nueva son obligatorias' });
+    if (String(newPassword).length < 8) return res.status(400).json({ message: 'La nueva contraseña debe tener al menos 8 caracteres' });
+
+    const user = await User.findByPk(req.user.id);
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+
+    const valid = await bcrypt.compare(currentPassword, user.passwordHash);
+    if (!valid) return res.status(401).json({ message: 'Contraseña actual incorrecta' });
+
+    const hashed = await bcrypt.hash(newPassword, 12);
+    await User.update({ passwordHash: hashed }, { where: { id: user.id } });
+
+    return res.json({ message: 'Contraseña actualizada' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Error al cambiar la contraseña' });
   }
 });
 

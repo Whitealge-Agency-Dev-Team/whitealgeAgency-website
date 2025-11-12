@@ -40,6 +40,21 @@ module.exports = { CRM_PERMISSIONS };
 */
 
 const CRM_PERMISSIONS = {
+  owner: {
+    users: ['create', 'read', 'update', 'delete'],
+    salaries: ['create', 'read', 'update', 'delete'],
+    user_dismiss: ['create', 'read', 'update', 'delete'],
+    clients: ['create', 'read', 'update', 'delete'],
+    projects: ['create', 'read', 'update', 'delete'],
+    objectives: ['create', 'read', 'update', 'delete'],
+    key_dates: ['create', 'read', 'update', 'delete'],
+    interviews: ['create', 'read', 'update', 'delete'],
+    dept_issues: ['create', 'read', 'update', 'delete'],
+    departments: ['create', 'read', 'update', 'delete'],
+    dept_functions: ['create', 'read', 'update', 'delete'],
+    project_dismiss: ['create', 'read', 'update', 'delete']
+  },
+
   admin: {
     users: ['create', 'read', 'update', 'delete'],
     salaries: ['create', 'read', 'update', 'delete'],

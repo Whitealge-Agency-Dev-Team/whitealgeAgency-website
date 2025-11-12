@@ -1,15 +1,15 @@
 const express = require("express");
 const router = express.Router();
-// const { authToken } = require("../middlewares/auth/authToken");
+const { authToken } = require("../middlewares/auth/authToken");
 const { authRole } = require("../middlewares/authorization/authRole");
 const { endpointCreate, endpointSearch, endpointUpdate, endpointDelete } = require("../controllers/handlers/endpointHandler");
 const { User, Salary, UserDimiss, Project, Role } = require("../models/index");
 const bcrypt = require("bcrypt");
 
-// router.use(authToken);
+router.use(authToken);
 
 // /users - Listar usuarios
-router.get("/", endpointSearch({
+router.get("/", authRole("users", "read"), endpointSearch({
   model: User,
   filters: [
     { field: "name", type: "string" },

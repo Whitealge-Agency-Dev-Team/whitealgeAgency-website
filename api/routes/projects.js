@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
-// const { authToken } = require("../middlewares/auth/authToken");
+const { authToken } = require("../middlewares/auth/authToken");
 const { authRole } = require("../middlewares/authorization/authRole");
 const { endpointCreate, endpointSearch, endpointUpdate, endpointDelete } = require("../controllers/handlers/endpointHandler");
 const { Project, Objective, KeyDate, User, Status } = require("../models/index");
 
-// router.use(authToken); //(Endpoints protegidos, mis preciosos)
+router.use(authToken); //(Endpoints protegidos, mis preciosos)
 
 // PROYECTOS
 router.get("/", authRole("projects", "read"), endpointSearch({

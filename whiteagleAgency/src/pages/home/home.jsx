@@ -5,6 +5,7 @@ import HomeSectionJSON from "../../JSON/HomeSection.json";
 import Welcome from "../../components/Home/Welcome/Welcome";
 import HomeSection from "../../components/Home/HomeSection/HomeSection";
 import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 export default function Home() {
   useEffect(() => {
@@ -14,6 +15,10 @@ export default function Home() {
   return (
     <>
       <Welcome />
+      <div style={{display:'flex',gap:'1rem',justifyContent:'center',margin:'20px 0'}}>
+        <Link to="/crm/login" className={HomeCSS.ctaLink}>Login</Link>
+        <Link to="/contacto" className={HomeCSS.ctaLink}>Realizar consulta</Link>
+      </div>
       <div className={HomeCSS.first}>
         {HomeSectionJSON.map((section, index) => (
           <HomeSection

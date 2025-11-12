@@ -1,19 +1,29 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 
-const authToken = (req, res, next) => {
+const { Role } = require("../../models");
+
+const authToken = async (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
   
   if (!token) {
-    return res.status(401).json({
-      message: "Credenciales no válidas",
-      status: 401,
-    });
+    return res.status(401).json({ message: "Credenciales no válidas" });
   }
     
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Cambié JWY_SECRET por JWT_SECRET
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Enriquecer con código de rol si no viene en el token
+    if (!decoded.role && decoded.roleId) {
+      try {
+        const roleInstance = await Role.findByPk(decoded.roleId);
+        if (roleInstance) decoded.role = roleInstance.code?.toLowerCase?.() || roleInstance.code;
+      } catch (e) {
+        // No bloquear si falla lookup de rol; continuar con roleId
+      }
+    }
+
     req.user = decoded;
     next();
   } catch (err) {
