@@ -16,7 +16,8 @@ export default function Footer() {
     }}>
       <Grid container spacing={3} alignItems="center" justifyContent="space-between">
         <Grid item xs={12} md={4} sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-          <img src={logo} alt="Home" style={{ width: "3rem", height: "3rem" }} />
+          <img src={logo} alt="Home" style={{ width: "6rem", height: "6rem", display: "flex" }} />
+          <Typography>WhitEagleAgency</Typography>
         </Grid>
         <Grid item xs={12} md={4}>
           <Typography variant="h6" sx={{ fontFamily: "Roboto Slab", mb: 2, textAlign: { xs: 'center', md: 'left' } }}>

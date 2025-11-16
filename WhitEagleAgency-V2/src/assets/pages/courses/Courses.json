@@ -1,0 +1,121 @@
+[
+  {
+    "name": "Desarrollo de talento y capacitación corporativa",
+    "desc": "",
+    "courses": [
+      {
+        "name": "Formación de vendedores calificados",
+        "desc": "Programa orientado a desarrollar habilidades clave en ventas consultivas, negociación efectiva y cierre de acuerdos. Ideal para equipos comerciales que buscan mejorar sus resultados y profesionalizar su desempeño.",
+        "img": "/images/logo.svg"
+      },
+      {
+        "name": "Planes integrales de capacitación",
+        "desc": "Diseñamos itinerarios formativos personalizados para organizaciones, alineados con sus objetivos estratégicos. Incluye módulos técnicos, habilidades blandas y seguimiento del aprendizaje.",
+        "img": "/images/logo.svg"
+      },
+      {
+        "name": "Inglés para mandos medios",
+        "desc": "Curso enfocado en mejorar el inglés técnico y comunicacional para líderes intermedios. Se trabajan reuniones, presentaciones, correos y vocabulario clave para ambientes corporativos.",
+        "img": "/images/logo.svg"
+      },
+      {
+        "name": "Coaching para Ejecutivos",
+        "desc": "Proceso de acompañamiento individual que potencia el liderazgo, la toma de decisiones y la gestión emocional. Diseñado para altos mandos que buscan liderar con propósito y claridad.",
+        "img": "/images/logo.svg"
+      },
+      {
+        "name": "Recursos Humanos",
+        "desc": "Formación orientada a profesionales del área de RR.HH. para actualizar conocimientos sobre selección, desarrollo, legislación laboral y gestión del talento en entornos cambiantes.",
+        "img": "/images/logo.svg"
+      },
+      {
+        "name": "Workshops",
+        "desc": "Talleres prácticos y dinámicos centrados en temas específicos como comunicación efectiva, trabajo en equipo, liderazgo, creatividad o resolución de conflictos. Adaptables a distintas áreas y niveles.",
+        "img": "/images/logo.svg"
+      }
+    ]
+  },
+  {
+    "name": "Marketing, Comunicación y Redes Sociales",
+    "desc": "",
+    "courses": [
+      {
+        "name": "Servicio de Community Manager",
+        "desc": "Aprendé a gestionar comunidades digitales con eficiencia, generando contenido relevante, administrando redes sociales y fortaleciendo la identidad de marca.",
+        "img": "/images/logo.svg"
+      },
+      {
+        "name": "Asesorías de redes sociales",
+        "desc": "Orientación personalizada para optimizar tus perfiles sociales, definir estrategias efectivas y mejorar la presencia digital de tu emprendimiento o empresa.",
+        "img": "/images/logo.svg"
+      },
+      {
+        "name": "Marketing Digital",
+        "desc": "Conocé las herramientas, canales y métricas clave del marketing digital moderno. Aprendé a crear campañas efectivas, segmentar audiencias y medir resultados.",
+        "img": "/images/logo.svg"
+      },
+      {
+        "name": "Web - Mail Mkt",
+        "desc": "Dominá las estrategias de email marketing y presencia web. Creá boletines efectivos, automatizá campañas y mejorá la conversión de visitantes en clientes.",
+        "img": "/images/logo.svg"
+      },
+      {
+        "name": "Estrategias de comunicación",
+        "desc": "Desarrollá habilidades clave para planificar, ejecutar y evaluar estrategias de comunicación interna y externa, alineadas con los objetivos de tu organización.",
+        "img": "/images/logo.svg"
+      },
+      {
+        "name": "Decisiones de Marca",
+        "desc": "Explorá el proceso de construcción y gestión de marca. Aprendé a tomar decisiones estratégicas que refuercen la identidad y posicionamiento de tu empresa.",
+        "img": "/images/logo.svg"
+      },
+      {
+        "name": "Idioma sensorial aplicado a los objetivos de ventas",
+        "desc": "Descubrí cómo utilizar el lenguaje sensorial para conectar emocionalmente con tus clientes y potenciar el impacto de tus mensajes comerciales.",
+        "img": "/images/logo.svg"
+      }
+    ]
+  },
+  {
+    "name": "Investigación de Mercado con transferencia al cliente",
+    "desc": "",
+    "courses": [
+      {
+        "name": "Mistery Shopper",
+        "desc": "Aprendé a evaluar la experiencia del cliente desde adentro. Este curso te enseñará a identificar fortalezas y debilidades del servicio mediante técnicas de observación profesional.",
+        "img": "/images/logo.svg"
+      },
+      {
+        "name": "Comportamientos del Consumidor",
+        "desc": "Explorá cómo piensan y actúan los consumidores al momento de comprar. Descubrí los factores psicológicos, sociales y culturales que influyen en sus decisiones.",
+        "img": "/images/logo.svg"
+      },
+      {
+        "name": "Evaluación de Inversiones",
+        "desc": "Conocé las herramientas esenciales para analizar y tomar decisiones de inversión. Aprendé a calcular riesgos, retornos y a evaluar la viabilidad económica de proyectos.",
+        "img": "/images/logo.svg"
+      }
+    ]
+  },
+  {
+    "name": "Consultoría y Planificación Estratégica",
+    "desc": "",
+    "courses": [
+      {
+        "name": "Planes de seguro",
+        "desc": "Conocé los distintos tipos de seguros, cómo funcionan y qué aspectos legales y financieros tener en cuenta para elegir el plan adecuado según cada necesidad.",
+        "img": "/images/logo.svg"
+      },
+      {
+        "name": "Meetings sin cargo",
+        "desc": "Aprendé a organizar y aprovechar reuniones gratuitas con alto valor estratégico, generando networking, validación de ideas y posibles alianzas.",
+        "img": "/images/logo.svg"
+      },
+      {
+        "name": "Start-Up de proyectos",
+        "desc": "Descubrí cómo transformar una idea en un proyecto viable. Desde la validación inicial hasta el armado del equipo y el modelo de negocio, con foco emprendedor.",
+        "img": "/images/logo.svg"
+      }
+    ]
+  }
+]
