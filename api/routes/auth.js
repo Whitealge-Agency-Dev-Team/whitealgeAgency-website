@@ -7,16 +7,18 @@ const { User, Role, Client } = require("../models/index");
 const { authToken } = require("../middlewares/auth/authToken");
 const { authRole } = require("../middlewares/authorization/authRole");
 const { createTransporter } = require("../config/email");
+const nodemailer = require("nodemailer");
+const { email } = require("../models/msg");
 
 // Login (se puede remover, ya que había otro en funcionamiento)
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ 
+    const user = await User.findOne({
       where: { email },
       include: [{ model: Role }]
     });
-    
+
     if (!user) {
       return res.status(401).json({ message: "Credenciales inválidas" });
     }
@@ -27,9 +29,9 @@ router.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign(
-      { 
-        id: user.id, 
-        email: user.email, 
+      {
+        id: user.id,
+        email: user.email,
         roleId: user.roleId,
         role: user.Role ? user.Role.code : undefined
       },
@@ -82,15 +84,14 @@ router.post("/invite-worker", authToken, authRole("users", "create"), async (req
 
     const transporter = await createTransporter()
 
-  
-    await transporter.sendMail({
+    const mail = await transporter.sendMail({
       to: email,
       subject: "Inivtación a proyecto",
-      html: `<p>Estás invitado al CRM. Establece tu contraseña aquí: ${link}</p>`
+      html: `<p>Estás invitado al CRM. Establece tu contraseña aquí: <a href="${link}" target="_blank">click aquí</a></p>`
     })
     console.log(`[INVITE] Enviar a ${email}: Estás invitado al CRM. Establece tu contraseña aquí: ${link}`);
 
-    res.status(201).json({ message: "Invitación enviada (consola)", userId: user.id });
+    res.status(201).json({ message: "Invitación enviada (consola)", userId: user.id, url: nodemailer.getTestMessageUrl(mail) });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error al invitar trabajador" });
@@ -101,12 +102,12 @@ router.post("/invite-worker", authToken, authRole("users", "create"), async (req
 router.post("/register-client", authToken, async (req, res) => {
   try {
     const { email, name, surname, clientId } = req.body;
-    
+
     const clientRole = await Role.findOne({ where: { code: 'C' } }); // C de cliente
     const tempPassword = Math.random().toString(36).slice(-10);
-    
+
     const hashedPassword = await bcrypt.hash(tempPassword, 12);
-    
+
     const user = await User.create({
       email,
       name,
@@ -122,7 +123,7 @@ router.post("/register-client", authToken, async (req, res) => {
     const link = `${FRONT_URL}/crm/set-password?token=${setPassToken}`;
     console.log(`[INVITE] Cliente aceptado ${email}. Establece tu contraseña aquí: ${link}`);
 
-    res.status(201).json({ 
+    res.status(201).json({
       message: "Cliente registrado exitosamente (invitación en consola)",
       userId: user.id
     });
@@ -139,12 +140,12 @@ router.get("/me", authToken, async (req, res) => {
       attributes: { exclude: ['passwordHash'] },
       include: [{ model: Role }]
     });
-    
+
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
-    
-    res.json({user});
+
+    res.json({ user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error al obtener perfil" });
@@ -155,15 +156,15 @@ router.put("/upload_me", authToken, async (req, res) => {
   try {
     const { name, surname, phoneNumber, email } = req.body;
     const allowedFields = { name, surname, phoneNumber, email };
-    
+
     Object.keys(allowedFields).forEach(key => {
       if (allowedFields[key] === undefined) {
         delete allowedFields[key];
       }
     });
-    
+
     await User.update(allowedFields, { where: { id: req.user.id } });
-    
+
     res.json({ message: "Perfil actualizado exitosamente" });
   } catch (error) {
     console.error(error);
@@ -218,6 +219,36 @@ router.post('/change-password', authToken, async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Error al cambiar la contraseña' });
+  }
+});
+
+
+router.post("/sendConsult", async (req, res) => {
+  try {
+    const { nombreEmpresa, emailEmpresa, telefonoEmpresa, industriaEmpresa, descEmpresa } = req.body;
+
+    const transporter = await createTransporter();
+
+    const mail = await transporter.sendMail({
+      to: "federicocoronado2006@gmail.com",
+      subject: "Solicitud de servicios (nuevo cliente)",
+      html: `
+      <h1>
+        ¿Quiere aceptar a un nuevo cliente?
+      </h1>
+      <p>Nombre: ${nombreEmpresa}</p>      
+      <p>Contacto:</p>      
+      <p>Email: ${emailEmpresa} </p>      
+      <p>Telefono: ${telefonoEmpresa} </p>      
+      <p>Sector industrial: ${industriaEmpresa}</p>      
+      <p>Problemática que enfrenta "${nombreEmpresa}": ${descEmpresa}</p>      
+      <a href="http://localhost:5173/">SI</a> 
+      <a href="http://localhost:5173/">NO</a>
+      `
+    })
+    res.json({ message: "funciona :D", status: 200, info: `nodemailer: ${nodemailer.getTestMessageUrl(mail)}` });
+  } catch (error) {
+    console.error(error);
   }
 });
 
