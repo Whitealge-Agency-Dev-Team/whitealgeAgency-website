@@ -8,6 +8,7 @@ const User = sequelize.define(
     email: {
       type: DataTypes.STRING(254),
       allowNull: false,
+      unique: true,
       validate: {
         max: { args: 254, msg: MSG.max("Email", 254) },
         isEmail: { msg: MSG.email },
@@ -68,7 +69,7 @@ const User = sequelize.define(
     indexes: [
       {
         unique: true,
-        fields: ["deleted_at", "email", "phone_number"],
+        fields: ["email", "phone_number"],
         name: "unique_existent_user",
       },
     ],

@@ -6,6 +6,7 @@ const { User, Role, Client } = require("../models/index");
 // const { validateUser } = require("../middlewares/validation/validateUser");
 const { authToken } = require("../middlewares/auth/authToken");
 const { authRole } = require("../middlewares/authorization/authRole");
+const { createTransporter } = require("../config/email");
 
 // Login (se puede remover, ya que había otro en funcionamiento)
 router.post("/login", async (req, res) => {
@@ -79,6 +80,14 @@ router.post("/invite-worker", authToken, authRole("users", "create"), async (req
     const FRONT_URL = process.env.FRONT_URL || 'http://localhost:5173';
     const link = `${FRONT_URL}/crm/set-password?token=${setPassToken}`;
 
+    const transporter = await createTransporter()
+
+  
+    await transporter.sendMail({
+      to: email,
+      subject: "Inivtación a proyecto",
+      html: `<p>Estás invitado al CRM. Establece tu contraseña aquí: ${link}</p>`
+    })
     console.log(`[INVITE] Enviar a ${email}: Estás invitado al CRM. Establece tu contraseña aquí: ${link}`);
 
     res.status(201).json({ message: "Invitación enviada (consola)", userId: user.id });
