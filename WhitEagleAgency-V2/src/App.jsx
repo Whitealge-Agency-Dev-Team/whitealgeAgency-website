@@ -7,6 +7,7 @@ import Services from "./assets/pages/services/services";
 import NoPage from "./assets/pages/NoPage.jsx";
 import Courses from "./assets/pages/courses/courses";
 import CourseData from "./assets/pages/courses/coursedata";
+import Relations from "./assets/pages/relationships/relationships";
 
 // CRM imports
 import ProtectedRoute from "./assets/crm/auth/ProtectedRoute.jsx";
@@ -31,6 +32,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
+            <Route path="relationships/" element={<Relations />} />
             <Route path="services/" element={<Services />} />
             <Route path="courses/" element={<Courses />} />
             <Route path="courses/:courseName" element={<CourseData />} />

@@ -8,9 +8,7 @@ const { authToken } = require("../middlewares/auth/authToken");
 const { authRole } = require("../middlewares/authorization/authRole");
 const { createTransporter } = require("../config/email");
 const nodemailer = require("nodemailer");
-const { email } = require("../models/msg");
 
-// Login (se puede remover, ya que había otro en funcionamiento)
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -246,7 +244,7 @@ router.post("/sendConsult", async (req, res) => {
       <a href="http://localhost:5173/">NO</a>
       `
     })
-    res.json({ message: "funciona :D", status: 200, info: `nodemailer: ${nodemailer.getTestMessageUrl(mail)}` });
+    res.json({ message: "Sent ;:)", status: 200, ulr: nodemailer.getTestMessageUrl(mail)});
   } catch (error) {
     console.error(error);
   }

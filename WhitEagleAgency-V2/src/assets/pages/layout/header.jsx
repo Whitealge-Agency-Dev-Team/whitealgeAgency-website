@@ -19,7 +19,7 @@ export default function Header() {
 
   const navLinks = [
     { label: "Servicios", to: "/services" },
-    { label: "Relaciones", to: "/" },
+    { label: "Relaciones", to: "/relationships" },
     { label: "Cursos", to: "/courses" },
   ];
 
