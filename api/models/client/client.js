@@ -27,11 +27,6 @@ const Client = sequelize.define(
       type: DataTypes.STRING(150),
       allowNull: false,
       field: "description",
-      validate: {
-        notNull: { msg: MSG.required("Descripción de cliente") },
-        notEmpty: { msg: MSG.required("Descripción de cliente") },
-        max: { args: 150, msg: MSG.required("Descripción de cliente", 150) },
-      },
     },
     employeeCount: {
       type: DataTypes.INTEGER,
@@ -45,10 +40,7 @@ const Client = sequelize.define(
     },
     cuit: {
       type: DataTypes.STRING(15),
-      allowNull: true, // opcional para permitir leads sin CUIT
-      validate: {
-        max: { args: 15, msg: MSG.required("CUIT de cliente", 15) },
-      },
+      allowNull: false,
     },
     contactEmail: {
       type: DataTypes.STRING(254),
@@ -65,11 +57,6 @@ const Client = sequelize.define(
       type: DataTypes.STRING(20),
       allowNull: false,
       field: "phone_number",
-      validate: {
-        notNull: { msg: MSG.required("Número telefónico de cliente") },
-        notEmpty: { msg: MSG.required("Número telefónico de cliente") },
-        max: { args: 20, msg: MSG.required("Número telefónico de cliente", 20) },
-      },
     },
     industry: {
       type: DataTypes.STRING(80),
@@ -80,6 +67,11 @@ const Client = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
       field: "status_id",
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      field: "user_id",
     },
   },
   {

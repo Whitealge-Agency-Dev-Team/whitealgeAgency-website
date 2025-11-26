@@ -42,7 +42,7 @@ server.get('/health', (req, res) => {
 });
 
 sequelize
-  .sync({ force: false })
+  .sync({ force: true })
   .then(() => {
     console.log("Base de datos iniciada con éxito");
     server.listen(PORT, async () =>

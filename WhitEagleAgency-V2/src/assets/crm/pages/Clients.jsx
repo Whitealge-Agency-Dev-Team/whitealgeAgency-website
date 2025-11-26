@@ -18,9 +18,13 @@ import AddIcon from "@mui/icons-material/Add";
 import api from "../services/client";
 import { useNavigate } from "react-router-dom";
 import Header from "../layout-crm/header";
+// Importamos el nuevo componente
+import CreateClientDialog from "./newClient"; 
 
 export default function CRMClients() {
   const navigate = useNavigate();
+
+  // --- Estados de la Tabla ---
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -30,45 +34,58 @@ export default function CRMClients() {
     industry: "",
   });
   const [error, setError] = useState("");
+  
+  // Datos auxiliares (Statuses)
   const [statuses, setStatuses] = useState([]);
   const [statusMap, setStatusMap] = useState({});
 
+  // --- Estado para controlar el Modal ---
+  const [openDialog, setOpenDialog] = useState(false);
+
   const columns = useMemo(
     () => [
-      { field: "id", headerName: "ID", width: 80 },
-      { field: "companyName", headerName: "Empresa", flex: 1, minWidth: 160 },
+      { field: "id", headerName: "ID", width: 60 },
+      { field: "companyName", headerName: "Empresa", flex: 1, minWidth: 150 },
+      { field: "cuit", headerName: "CUIT", width: 120 },
       { field: "contactEmail", headerName: "Email", flex: 1, minWidth: 180 },
-      { field: "phone", headerName: "Teléfono", width: 140 },
-      { field: "industry", headerName: "Industria", width: 150 },
+      { field: "phone", headerName: "Teléfono", width: 130 },
+      { field: "industry", headerName: "Industria", width: 130 },
+      { field: "employeeCount", headerName: "Empl.", width: 80, type: "number" },
       {
         field: "statusId",
         headerName: "Estado",
-        width: 140,
+        width: 130,
         renderCell: (params) => (
           <Chip size="small" label={statusMap[params.value] ?? "-"} />
         ),
       },
     ],
-    []
+    [statusMap]
   );
 
+  // --- Carga de Datos ---
   async function fetchData(signal) {
-    setLoading(true);
-    setError("");
+    // Nota: Eliminamos setError("") al inicio para evitar parpadeos si es un refresh silencioso
+    // pero si vienes de un error previo, es bueno limpiarlo.
     try {
       const qs = new URLSearchParams();
       Object.entries(filters).forEach(([k, v]) => {
         if (v !== "" && v != null) qs.append(k, v);
       });
-      const data = await api.get(`/clients?${qs.toString()}`);
+      const config = signal ? { signal } : {};
+      const data = await api.get(`/clients?${qs.toString()}`, config);
+
       const list = Array.isArray(data?.data?.records)
         ? data.data.records
         : Array.isArray(data)
         ? data
         : data?.rows || [];
       setRows(list);
+      setError(""); // Limpiamos error si la carga fue exitosa
     } catch (e) {
-      setError(e.message || "Error al cargar clientes");
+      if (e.name !== "CanceledError") {
+        setError(e.message || "Error al cargar clientes");
+      }
     } finally {
       setLoading(false);
     }
@@ -105,13 +122,13 @@ export default function CRMClients() {
 
   const handleApply = () => fetchData();
   const handleReset = () => {
-    setFilters({
-      companyName: "",
-      contactEmail: "",
-      statusId: "",
-      industry: "",
-    });
-    fetchData();
+    setFilters({ companyName: "", contactEmail: "", statusId: "", industry: "" });
+    setTimeout(() => fetchData(), 0);
+  };
+
+  // Callback cuando se crea un cliente exitosamente
+  const handleClientCreated = () => {
+    fetchData(); // Recargamos la tabla
   };
 
   return (
@@ -127,6 +144,7 @@ export default function CRMClients() {
           spacing={2}
           alignItems={{ xs: "stretch", sm: "center" }}
         >
+          {/* ... Filtros ... */}
           <TextField
             label="Empresa"
             name="companyName"
@@ -141,21 +159,14 @@ export default function CRMClients() {
             onChange={handleChange}
             size="small"
           />
-          <TextField
-            label="Industria"
-            name="industry"
-            value={filters.industry}
-            onChange={handleChange}
-            size="small"
-          />
-          <TextField
+           <TextField
             select
             label="Estado"
             name="statusId"
             value={filters.statusId}
             onChange={handleChange}
             size="small"
-            sx={{ minWidth: 180 }}
+            sx={{ minWidth: 150 }}
           >
             <MenuItem value="">Todos</MenuItem>
             {statuses.map((s) => (
@@ -173,10 +184,17 @@ export default function CRMClients() {
           <IconButton onClick={() => fetchData()} aria-label="recargar">
             <RefreshIcon />
           </IconButton>
-          <Button variant="outlined" startIcon={<AddIcon />}>
+          
+          {/* Botón Nuevo: Solo cambia el estado true */}
+          <Button 
+            variant="outlined" 
+            startIcon={<AddIcon />} 
+            onClick={() => setOpenDialog(true)}
+          >
             Nuevo
           </Button>
         </Stack>
+
         <Divider sx={{ my: 2 }} />
         {loading && <LinearProgress />}
         {error && (
@@ -197,6 +215,14 @@ export default function CRMClients() {
           />
         </Box>
       </Box>
+
+      {/* Renderizamos el componente hijo segmentado */}
+      <CreateClientDialog 
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        onSuccess={handleClientCreated}
+        statuses={statuses}
+      />
     </>
   );
 }

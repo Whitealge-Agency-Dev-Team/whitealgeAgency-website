@@ -8,6 +8,7 @@ const authToken = async (req, res, next) => {
   const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
   
   if (!token) {
+    console.log(token);
     return res.status(401).json({ message: "Credenciales no válidas" });
   }
     
