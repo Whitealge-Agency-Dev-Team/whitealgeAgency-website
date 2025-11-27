@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 // Servicios y Componentes
 import api from "../services/client";
 import Header from "../layout-crm/header";
+import Footer from "../layout-crm/footer";
 import CreateProjectDialog from "./newProject"; // Asegúrate que la ruta sea correcta
 
 export default function CRMProjects() {
@@ -177,8 +178,6 @@ export default function CRMProjects() {
   return (
     <Box sx={{ p: 2 }}>
       <Header />
-      <Toolbar />
-
       <Stack
         direction="row"
         justifyContent="space-between"
@@ -272,6 +271,7 @@ export default function CRMProjects() {
         statuses={statuses}
         clients={clients}
       />
+      <Footer />
     </Box>
   );
 }

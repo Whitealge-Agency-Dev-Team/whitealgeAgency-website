@@ -112,7 +112,7 @@ export default function HomeSection() {
           alignItems: "center",
           justifyContent: "center",
           overflow: "hidden",
-          p: "2%"
+          p: "2%",
         }}
       >
         <Typography
@@ -132,10 +132,46 @@ export default function HomeSection() {
             alignItems: "center",
           }}
         >
-          Nuesto equipo
+          Nuesto staff
         </Typography>
       </Box>
       <StaffSection />
+      <Typography
+        variant="body1"
+        sx={{
+          fontFamily: "Roboto Slab",
+          color: "#000000ff",
+          textShadow: "0 1px 6px #1257A2cc",
+          px: { xs: 1, sm: 3 },
+          lineHeight: 4.5,
+          maxWidth: 540,
+          fontSize: {
+            xs: "clamp(1.05rem, 4vw, 1.35rem)",
+            sm: "clamp(1.15rem, 2vw, 1.5rem)",
+            md: "1.8rem",
+          },
+          display: "block", // (Opcional) Asegura que se comporte como bloque para aceptar márgenes
+        }}
+      >
+        ¿Qué hacemos ?
+      </Typography>
+      <Typography
+        variant="body1"
+        sx={{
+          color: "#000000ff",
+          px: { xs: 1, sm: 3 },
+          lineHeight: 1.5,
+          maxWidth: 800,
+          display: "block", // (Opcional) Asegura que se comporte como bloque para aceptar márgenes
+        }}
+      >
+        Nuestro compromiso es asistir a las Pymes en su crecimiento y
+        rentabilidad a través de cursos, micro jornadas y seminarios de
+        aplicación rápida. "Joint Venture" para terceros y organigramas
+        especiales para Pymes. Formación ejecutiva presencial. Taller de
+        evaluaciones. Práctica de escenarios, organización y control. Workshops
+        intensivos.
+      </Typography>
     </>
   );
 }

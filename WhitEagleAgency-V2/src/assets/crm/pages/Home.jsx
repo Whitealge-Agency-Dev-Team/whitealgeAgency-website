@@ -1,18 +1,8 @@
-import { useState } from "react";
-import {
-  Toolbar,
-  Typography,
-  Drawer,
-  List,
-  ListItemButton,
-  ListItemText,
-  CssBaseline,
-  Box,
-  Button,
-} from "@mui/material";
+import { Typography, Box, Button, CssBaseline, Container } from "@mui/material";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import Header from "../layout-crm/header";
+import Footer from "../layout-crm/footer";
 
 function InviteCTA() {
   const { user } = useAuth();
@@ -20,106 +10,70 @@ function InviteCTA() {
     .toString()
     .toUpperCase();
   const canInvite = ["A", "O", "T"].includes(roleCode);
+
   if (!canInvite) return null;
+
   return (
-    <Button component={Link} to="/crm/invitar" variant="outlined">
-      Invitar trabajador
-    </Button>
+    <Box sx={{ mt: 3 }}>
+      <Button
+        component={Link}
+        to="/crm/invitar"
+        variant="contained"
+        disableElevation
+      >
+        Invitar trabajador
+      </Button>
+    </Box>
   );
 }
 
-const drawerWidth = 240;
-
 export default function CRMHome() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const { logout } = useAuth();
-
-  const exit = () => {
-    logout();
-    window.location.href = "http://localhost:5173/";
-  };
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
-  const drawer = (
-    <div>
-      <Toolbar />
-      <List>
-        {[
-          { label: "Clientes", to: "/crm/clientes" },
-          { label: "Proyectos", to: "/crm/proyectos" },
-          { label: "Organigrama", to: "/crm/organigrama" },
-        ].map((item) => (
-          <ListItemButton key={item.label} component={Link} to={item.to}>
-            <ListItemText primary={item.label} />
-          </ListItemButton>
-        ))}
-      </List>
-      <Button variant="outlined" onClick={exit}>
-        Cerrar Sesión
-      </Button>
-    </div>
-  );
-
   return (
-      <Box sx={{ display: "flex" }}>
-        <CssBaseline />
-        <Header />
-        //aca comienza el menu
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        bgcolor: "#f9f9f9",
+      }}
+    >
+      <CssBaseline />
+      <Header />
+
+      <Container component="main" maxWidth="lg" sx={{ flexGrow: 1, py: 4 }}>
+        {/* Un Box con estilo de tarjeta limpia */}
         <Box
-          component="nav"
-          sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-          aria-label="crm navigation"
-        >
-          <Drawer
-            variant="temporary"
-            open={mobileOpen}
-            onClose={handleDrawerToggle}
-            ModalProps={{ keepMounted: true }}
-            sx={{
-              display: { xs: "block", sm: "none" },
-              "& .MuiDrawer-paper": {
-                boxSizing: "border-box",
-                width: drawerWidth,
-              },
-            }}
-          >
-            {drawer}
-          </Drawer>
-          <Drawer
-            variant="permanent"
-            sx={{
-              display: { xs: "none", sm: "block" },
-              "& .MuiDrawer-paper": {
-                boxSizing: "border-box",
-                width: drawerWidth,
-              },
-            }}
-            open
-          >
-            {drawer}
-          </Drawer>
-        </Box>
-        <Box
-          component="main"
           sx={{
-            flexGrow: 1,
-            p: 3,
-            width: { sm: `calc(100% - ${drawerWidth}px)` },
+            bgcolor: "white",
+            p: 4,
+            borderRadius: 2,
+            border: "1px solid #eee",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.02)",
           }}
         >
-          <Toolbar />
-          <Typography variant="h4" gutterBottom>
+          <Typography
+            variant="h4"
+            component="h1"
+            gutterBottom
+            sx={{ fontWeight: "bold", color: "#1a1a1a" }}
+          >
             Bienvenido al CRM de whitEagle
           </Typography>
-          <Typography sx={{ mb: 2 }}>
-            Aquí puedes gestionar tus clientes, proyectos y tareas fácilmente.
+
+          <Typography
+            variant="body1"
+            color="text.secondary"
+            sx={{ mb: 2, maxWidth: 600 }}
+          >
+            Gestiona tus clientes, visualiza el progreso de proyectos y
+            administra el organigrama de la empresa desde la barra de navegación
+            superior.
           </Typography>
-          {/* Botón de invitación visible para roles con permiso (A, O, T) */}
+
           <InviteCTA />
         </Box>
-      </Box>
+      </Container>
+      <Footer />
+    </Box>
   );
 }

@@ -18,8 +18,8 @@ import AddIcon from "@mui/icons-material/Add";
 import api from "../services/client";
 import { useNavigate } from "react-router-dom";
 import Header from "../layout-crm/header";
-// Importamos el nuevo componente
-import CreateClientDialog from "./newClient"; 
+import Footer from "../layout-crm/footer";
+import CreateClientDialog from "./newClient";
 
 export default function CRMClients() {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export default function CRMClients() {
     industry: "",
   });
   const [error, setError] = useState("");
-  
+
   // Datos auxiliares (Statuses)
   const [statuses, setStatuses] = useState([]);
   const [statusMap, setStatusMap] = useState({});
@@ -50,7 +50,12 @@ export default function CRMClients() {
       { field: "contactEmail", headerName: "Email", flex: 1, minWidth: 180 },
       { field: "phone", headerName: "Teléfono", width: 130 },
       { field: "industry", headerName: "Industria", width: 130 },
-      { field: "employeeCount", headerName: "Empl.", width: 80, type: "number" },
+      {
+        field: "employeeCount",
+        headerName: "Empl.",
+        width: 80,
+        type: "number",
+      },
       {
         field: "statusId",
         headerName: "Estado",
@@ -122,7 +127,12 @@ export default function CRMClients() {
 
   const handleApply = () => fetchData();
   const handleReset = () => {
-    setFilters({ companyName: "", contactEmail: "", statusId: "", industry: "" });
+    setFilters({
+      companyName: "",
+      contactEmail: "",
+      statusId: "",
+      industry: "",
+    });
     setTimeout(() => fetchData(), 0);
   };
 
@@ -134,7 +144,6 @@ export default function CRMClients() {
   return (
     <>
       <Header />
-      <Toolbar />
       <Box sx={{ p: 2 }}>
         <Typography variant="h5" gutterBottom>
           Clientes
@@ -159,7 +168,7 @@ export default function CRMClients() {
             onChange={handleChange}
             size="small"
           />
-           <TextField
+          <TextField
             select
             label="Estado"
             name="statusId"
@@ -184,11 +193,11 @@ export default function CRMClients() {
           <IconButton onClick={() => fetchData()} aria-label="recargar">
             <RefreshIcon />
           </IconButton>
-          
+
           {/* Botón Nuevo: Solo cambia el estado true */}
-          <Button 
-            variant="outlined" 
-            startIcon={<AddIcon />} 
+          <Button
+            variant="outlined"
+            startIcon={<AddIcon />}
             onClick={() => setOpenDialog(true)}
           >
             Nuevo
@@ -217,12 +226,13 @@ export default function CRMClients() {
       </Box>
 
       {/* Renderizamos el componente hijo segmentado */}
-      <CreateClientDialog 
+      <CreateClientDialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
         onSuccess={handleClientCreated}
         statuses={statuses}
       />
+      <Footer/>
     </>
   );
 }
