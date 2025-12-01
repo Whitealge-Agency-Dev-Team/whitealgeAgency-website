@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Grid, Paper, Typography } from "@mui/material";
+import { green } from "@mui/material/colors";
 
 const services = [
   {
@@ -33,7 +34,7 @@ export default function Services() {
       <Typography variant="subtitle1" color="text.secondary" align="center" sx={{ mb: 4 }}>
         En WhitEagle ofrecemos soluciones adaptadas a tus necesidades: desde detectar problemas en sistemas hasta reuniones periódicas para medir avances y resultados.
       </Typography>
-      <Grid container spacing={4} justifyContent="center">
+      <Grid container spacing={5}>
         {services.map((service, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>
             <Paper elevation={2} sx={{ p: 3, borderRadius: 2, height: "100%", display: "flex", flexDirection: "column", justifyContent: "center" }}>

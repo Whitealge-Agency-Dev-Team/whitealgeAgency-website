@@ -108,7 +108,8 @@ async function defaultUser() {
         phone: "1100000004",
         problemDescription: "Quieren implementar un CRM y automatizar reportes",
         industry: "Servicios",
-        statusId: statusEnCurso ? statusEnCurso.id : null
+        statusId: statusEnCurso ? statusEnCurso.id : null,
+        cuit: "1111111",
       }
     });
 
@@ -133,7 +134,9 @@ async function defaultUser() {
         surname: "Cliente",
         passwordHash: demoPassHash,
         roleId: roleInstances['C'].id,
-        isActive: true
+        isActive: true,
+        cuit: 123123131,
+        userId: 1
       }
     });
 

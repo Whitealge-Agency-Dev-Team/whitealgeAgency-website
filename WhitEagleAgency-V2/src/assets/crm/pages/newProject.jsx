@@ -30,7 +30,6 @@ export default function CreateProjectDialog({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Reseteamos el formulario al abrir
   useEffect(() => {
     if (open) {
       setFormData(initialProjectState);

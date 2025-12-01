@@ -10,46 +10,41 @@ import {
   TextField,
   Typography,
   MenuItem,
-  Toolbar,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddIcon from "@mui/icons-material/Add";
-import { useNavigate } from "react-router-dom";
 
-// Servicios y Componentes
 import api from "../services/client";
 import Header from "../layout-crm/header";
 import Footer from "../layout-crm/footer";
-import CreateProjectDialog from "./newProject"; // Asegúrate que la ruta sea correcta
+import CreateProjectDialog from "./newProject";
+import ProjectTeamDialog from "./ProjectDetail";
 
 export default function CRMProjects() {
-  const navigate = useNavigate();
-
-  // --- Estados de Datos ---
+  const [ProjectBtn, setProjectBtn] = useState(false);
+  const [userRole, setUserRole] = useState(null);
   const [rows, setRows] = useState([]);
+  const [allRows, setAllRows] = useState([]);
   const [statuses, setStatuses] = useState([]);
-  const [clients, setClients] = useState([]); // Nuevo: Para pasarlo al Dialog
+  const [clients, setClients] = useState([]);
   const [statusMap, setStatusMap] = useState({});
-
-  // --- Estados de UI ---
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [users, setUsers] = useState([]);
+  const [teamUserIds, setTeamUserIds] = useState([]);
+  const [teamDialogOpen, setTeamDialogOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [filters, setFilters] = useState({
     name: "",
     description: "",
     statusId: "",
   });
 
-  // --- Estado del Modal ---
   const [openDialog, setOpenDialog] = useState(false);
-
-  // Definición de columnas
   const columns = useMemo(
     () => [
       { field: "id", headerName: "ID", width: 60 },
-      // Nota: Tu backend anterior no tenía 'name', solo 'description'.
-      // Si agregaste 'name' al modelo, déjalo aquí. Si no, esta columna saldrá vacía.
       {
         field: "description",
         headerName: "Descripción",
@@ -74,24 +69,34 @@ export default function CRMProjects() {
         headerName: "Cierre Estimado",
         width: 140,
         valueFormatter: (params) => {
-          if (!params.value) return "-";
-          return new Date(params.value).toLocaleDateString();
+          if (!params) return "-";
+          return new Date(params).toLocaleDateString();
         },
       },
-      // Estas columnas dependen de si tu backend las devuelve o no
       {
         field: "createdAt",
         headerName: "Creado",
         width: 140,
-        valueFormatter: (p) =>
-          p.value ? new Date(p.value).toLocaleDateString() : "-",
+        valueFormatter: (p) => (p ? new Date(p).toLocaleDateString() : "-"),
       },
     ],
     [statusMap]
   );
-
-  // --- Carga de Datos Principales (Proyectos) ---
+  const addButton = () => {
+    if (userRole != 4)
+      return (
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={handleOpenNew}
+        >
+          Nuevo
+        </Button>
+      );
+  };
   async function fetchData() {
+    setLoading(true);
     setError("");
     try {
       const qs = new URLSearchParams();
@@ -101,14 +106,14 @@ export default function CRMProjects() {
 
       const data = await api.get(`/projects?${qs.toString()}`);
 
-      // Normalización de respuesta
-      const list = Array.isArray(data?.data?.records)
-        ? data.data.records
-        : Array.isArray(data)
-        ? data
-        : data?.rows || data?.data || [];
-
+      const list = Array.isArray(data["projects"])
+        ? data["projects"]
+        : Array.isArray(data.data)
+        ? data.data
+        : data.data?.rows || [];
+      setUserRole(Number(data["userRole"]));
       setRows(list);
+      setAllRows(list);
     } catch (e) {
       console.error(e);
       setError(e.message || "Error al cargar proyectos");
@@ -117,17 +122,53 @@ export default function CRMProjects() {
     }
   }
 
-  // --- Carga de Dependencias (Status y Clientes) ---
+  const searchFilters = () => {
+    const descriptionFilters = Array.isArray(filters.description)
+      ? filters.description.map((s) => s?.toLowerCase().trim()).filter(Boolean)
+      : [];
+
+    const statusFilter = filters.statusId ?? "";
+
+    const filteredRows = allRows.filter((row) => {
+      const description = row.description?.toLowerCase() ?? "";
+      const status = row.statusId ?? "";
+
+      const hasTextFilters = descriptionFilters.length > 0;
+
+      const matchesDescription = hasTextFilters
+        ? descriptionFilters.some((term) => description.startsWith(term))
+        : false;
+
+      const matchesStatus = statusFilter ? status === statusFilter : true;
+
+      if (!hasTextFilters) {
+        return matchesStatus;
+      }
+
+      return matchesDescription && matchesStatus;
+    });
+
+    if (filteredRows.length > 0) {
+      setRows(filteredRows);
+    } else {
+      setRows([]);
+    }
+  };
+  const handleSaveProjectTeam = async (projectId, userIds) => {
+    await api.post(`/projects/${projectId}/team`, {
+      userIds,
+    });
+  };
+
   useEffect(() => {
     async function fetchDependencies() {
       try {
-        // Ejecutamos ambas peticiones en paralelo para mayor velocidad
-        const [statusRes, clientRes] = await Promise.all([
-          api.get("/status").catch(() => []), // Si falla uno, no rompe el otro
+        const [statusRes, clientRes, usersRes] = await Promise.all([
+          api.get("/status").catch(() => []),
           api.get("/clients").catch(() => []),
+          api.get("/").catch(() => []),
         ]);
 
-        // Procesar Status
         const statusList = Array.isArray(statusRes)
           ? statusRes
           : statusRes?.data || [];
@@ -139,11 +180,15 @@ export default function CRMProjects() {
         });
         setStatusMap(map);
 
-        // Procesar Clientes
         const clientList = Array.isArray(clientRes)
           ? clientRes
           : clientRes?.data || clientRes?.rows || [];
         setClients(clientList);
+
+        const usersList = Array.isArray(usersRes)
+          ? usersRes
+          : usersRes?.data || usersRes?.rows || [];
+        setUsers(usersList);
       } catch (e) {
         console.error("Error cargando dependencias", e);
       }
@@ -151,25 +196,36 @@ export default function CRMProjects() {
 
     fetchDependencies();
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // --- Handlers ---
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleApply = () => fetchData();
+  const handleRowClick = async (params) => {
+    const project = params.row;
+    setSelectedProject(project);
+    try {
+      const res = await api.get(`/projects/${project.id}/`);
+      const teamList = res?.team || res?.data || res?.rows || [];
+      setTeamUserIds(teamList.map((u) => u.id));
+    } catch (e) {
+      console.error("Error cargando equipo del proyecto", e);
+      setTeamUserIds([]);
+    }
+    setTeamDialogOpen(true);
+  };
+
+  const handleApply = () => searchFilters();
 
   const handleReset = () => {
     setFilters({ name: "", description: "", statusId: "" });
-    // Nota: fetchData usa el estado 'filters'. Al hacer setFilters,
-    // fetchData usará el estado viejo en este ciclo si se llama inmediatamente.
-    // Lo ideal es pasar los filtros limpios a fetchData o usar useEffect en filters.
-    // Por simplicidad, recargamos la página o forzamos un refresh manual después.
-    // Una solución rápida es recargar directamente aquí simulando el reset:
-    window.location.reload();
+    setRows(allRows);
+  };
+
+  const handleReload = () => {
+    fetchData();
   };
 
   const handleOpenNew = () => setOpenDialog(true);
@@ -187,15 +243,13 @@ export default function CRMProjects() {
         <Typography variant="h5">Proyectos</Typography>
       </Stack>
 
-      {/* Filtros */}
       <Stack
         direction={{ xs: "column", sm: "row" }}
         spacing={2}
         alignItems={{ xs: "stretch", sm: "center" }}
       >
-        {/* Nota: Si tu backend no filtra por nombre, este campo no hará nada */}
         <TextField
-          label="Nombre/Desc"
+          label="Descripción"
           name="description"
           value={filters.description}
           onChange={handleChange}
@@ -203,14 +257,14 @@ export default function CRMProjects() {
         />
         <TextField
           select
-          label="Estado"
+          label="Estados"
           name="statusId"
           value={filters.statusId}
           onChange={handleChange}
           size="small"
           sx={{ minWidth: 180 }}
         >
-          <MenuItem value="">Todos</MenuItem>
+          <MenuItem value=""></MenuItem>
           {statuses.map((s) => (
             <MenuItem key={s.id} value={s.id}>
               {s.name}
@@ -223,18 +277,11 @@ export default function CRMProjects() {
         <Button variant="text" onClick={handleReset}>
           Limpiar
         </Button>
-        <Box sx={{ flexGrow: 1 }} /> {/* Espaciador */}
-        <IconButton onClick={() => fetchData()} aria-label="recargar">
+        <Box sx={{ flexGrow: 1 }} />
+        <IconButton onClick={handleReload} aria-label="recargar">
           <RefreshIcon />
         </IconButton>
-        <Button
-          variant="contained" // Cambiado a contained para resaltar la acción principal
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={handleOpenNew}
-        >
-          Nuevo
-        </Button>
+        {addButton()}
       </Stack>
 
       <Divider sx={{ my: 2 }} />
@@ -255,21 +302,26 @@ export default function CRMProjects() {
           initialState={{
             pagination: { paginationModel: { pageSize: 10, page: 0 } },
           }}
-          // Uso correcto de navegación SPA
-          onRowClick={(params) => navigate(`/crm/proyectos/${params.id}`)}
+          onRowClick={handleRowClick}
         />
       </Box>
 
-      {/* Integración del Nuevo Dialog */}
       <CreateProjectDialog
         open={openDialog}
         onClose={handleCloseDialog}
         onSuccess={async () => {
-          // Refrescamos la tabla al crear uno nuevo exitosamente
           await fetchData();
         }}
         statuses={statuses}
         clients={clients}
+      />
+      <ProjectTeamDialog
+        open={teamDialogOpen}
+        onClose={() => setTeamDialogOpen(false)}
+        project={selectedProject}
+        users={users}
+        initialUserIds={teamUserIds}
+        onSave={handleSaveProjectTeam}
       />
       <Footer />
     </Box>

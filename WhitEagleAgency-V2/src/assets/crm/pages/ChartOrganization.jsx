@@ -1,4 +1,4 @@
-import { Box, Grid, Paper, Typography, Avatar, Toolbar } from "@mui/material";
+import { Box, Grid, Paper, Typography, Avatar } from "@mui/material";
 import Header from "../layout-crm/header";
 import Footer from "../layout-crm/footer";
 
@@ -42,13 +42,12 @@ export default function Chart() {
             sm: "clamp(1.15rem, 2vw, 1.5rem)",
             md: "1.8rem",
           },
-          // --- CAMBIOS AQUÍ ---
           textAlign: "center", // 1. Centra el texto dentro de la caja
           mx: "auto", // 2. Centra la caja misma si el padre es más ancho que 540px
           display: "block", // (Opcional) Asegura que se comporte como bloque para aceptar márgenes
         }}
       >
-        Organmigrama de la organización
+        Organigrama de la organización
       </Typography>
       {/* Contenedor principal del organigrama */}
       <Box
@@ -87,20 +86,16 @@ export default function Chart() {
           </Typography>
         </Paper>
 
-        {/* --- 2. Líneas de Flujo (Vertical y Horizontal) --- */}
-        {/* Línea Vertical (baja del manager) */}
         <Box sx={{ height: 40, width: "2px", bgcolor: "divider" }} />
 
-        {/* Línea Horizontal (conecta a los agentes) */}
         <Box
           sx={{
             height: "2px",
-            width: { xs: "80%", md: "53%" }, // Ancho responsivo
+            width: { xs: "80%", md: "53%" }, 
             bgcolor: "divider",
           }}
         />
 
-        {/* --- 3. Tarjetas de Agentes (Grid Responsivo) --- */}
         <Grid
           container
           justifyContent="center"
@@ -123,10 +118,9 @@ export default function Chart() {
                 flexDirection: "column",
                 alignItems: "center",
                 position: "relative",
-                pt: 4, // Padding superior para la línea conectora
+                pt: 4, 
               }}
             >
-              {/* Línea Conectora Vertical (sube al agente) */}
               <Box
                 sx={{
                   height: 40, // Debe coincidir con el 'pt'
@@ -139,7 +133,6 @@ export default function Chart() {
                 }}
               />
 
-              {/* Tarjeta del Agente */}
               <Paper
                 elevation={2}
                 sx={{

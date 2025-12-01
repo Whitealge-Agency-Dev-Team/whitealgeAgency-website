@@ -16,15 +16,12 @@ import { DataGrid } from "@mui/x-data-grid";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import AddIcon from "@mui/icons-material/Add";
 import api from "../services/client";
-import { useNavigate } from "react-router-dom";
 import Header from "../layout-crm/header";
 import Footer from "../layout-crm/footer";
 import CreateClientDialog from "./newClient";
 
 export default function CRMClients() {
-  const navigate = useNavigate();
-
-  // --- Estados de la Tabla ---
+  const [userRole, setUserRole] = useState(null);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -33,6 +30,7 @@ export default function CRMClients() {
     statusId: "",
     industry: "",
   });
+  const [allRows, setAllRows] = useState([]);
   const [error, setError] = useState("");
 
   // Datos auxiliares (Statuses)
@@ -67,26 +65,74 @@ export default function CRMClients() {
     ],
     [statusMap]
   );
+  const addBtn = () => {
+    if (userRole != 4)
+      return (
+        <Button
+          variant="outlined"
+          startIcon={<AddIcon />}
+          onClick={() => setOpenDialog(true)}
+        >
+          Nuevo
+        </Button>
+      );
+  };
 
-  // --- Carga de Datos ---
+  const searchFilters = () => {
+    const companyFilter = filters.companyName?.toLowerCase() ?? "";
+    const emailFilter = filters.contactEmail?.toLowerCase() ?? "";
+    const statusFilter = filters.statusId ?? "";
+
+    const filteredRows = allRows.filter((row) => {
+      const name = row.companyName?.toLowerCase() ?? "";
+      const email = row.contactEmail?.toLowerCase() ?? "";
+      const status = row.statusId ?? "";
+
+      const hasTextFilters = companyFilter || emailFilter;
+
+      const matchesName = companyFilter
+        ? name.startsWith(companyFilter)
+        : false;
+
+      const matchesEmail = emailFilter ? email === emailFilter : false;
+
+      const matchesStatus = statusFilter ? status === statusFilter : true;
+
+      if (!hasTextFilters) {
+        return matchesStatus;
+      }
+
+      return (matchesName || matchesEmail) && matchesStatus;
+    });
+
+    if (filteredRows.length > 0) {
+      setRows(filteredRows);
+    } else {
+      setRows([]);
+    }
+  };
+
   async function fetchData(signal) {
-    // Nota: Eliminamos setError("") al inicio para evitar parpadeos si es un refresh silencioso
-    // pero si vienes de un error previo, es bueno limpiarlo.
     try {
       const qs = new URLSearchParams();
       Object.entries(filters).forEach(([k, v]) => {
         if (v !== "" && v != null) qs.append(k, v);
       });
       const config = signal ? { signal } : {};
-      const data = await api.get(`/clients?${qs.toString()}`, config);
+      const response = await api.get(`/clients?${qs.toString()}`, config);
 
-      const list = Array.isArray(data?.data?.records)
-        ? data.data.records
-        : Array.isArray(data)
-        ? data
-        : data?.rows || [];
+      const list = Array.isArray(response["clients"])
+        ? response["clients"]
+        : Array.isArray(response.data)
+        ? response.data
+        : response.data?.rows || [];
+
+      const roleUser = Number(response["userRole"]);
+      setUserRole(roleUser);
+
       setRows(list);
-      setError(""); // Limpiamos error si la carga fue exitosa
+      setAllRows(list);
+      setError("");
     } catch (e) {
       if (e.name !== "CanceledError") {
         setError(e.message || "Error al cargar clientes");
@@ -98,24 +144,37 @@ export default function CRMClients() {
 
   useEffect(() => {
     const controller = new AbortController();
+
     async function fetchStatuses() {
       try {
-        const data = await api.get("/status");
-        const list = Array.isArray(data)
+        const data = await api.get("/status", {
+          signal: controller.signal,
+        });
+
+        // Normalización de respuesta (igual estilo que en projects)
+        const list = Array.isArray(data?.data?.records)
+          ? data.data.records
+          : Array.isArray(data)
           ? data
-          : data?.data?.records || data?.statuses || data?.rows || [];
+          : data?.rows || data?.data || [];
+
         setStatuses(list);
+
         const map = {};
         list.forEach((s) => {
           if (s?.id != null) map[s.id] = s.name;
         });
         setStatusMap(map);
       } catch (e) {
-        // ignore
+        if (e.name === "CanceledError" || e.name === "AbortError") return;
+        console.error("Error cargando estados", e);
+        // opcional: setErrorEstados(...)
       }
     }
+
     fetchStatuses();
     fetchData(controller.signal);
+
     return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -125,7 +184,6 @@ export default function CRMClients() {
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleApply = () => fetchData();
   const handleReset = () => {
     setFilters({
       companyName: "",
@@ -134,6 +192,15 @@ export default function CRMClients() {
       industry: "",
     });
     setTimeout(() => fetchData(), 0);
+  };
+  const handleShowAll = () => {
+    setFilters({
+      companyName: "",
+      contactEmail: "",
+      statusId: "",
+      industry: "",
+    });
+    setRows(allRows);
   };
 
   // Callback cuando se crea un cliente exitosamente
@@ -153,7 +220,6 @@ export default function CRMClients() {
           spacing={2}
           alignItems={{ xs: "stretch", sm: "center" }}
         >
-          {/* ... Filtros ... */}
           <TextField
             label="Empresa"
             name="companyName"
@@ -177,31 +243,23 @@ export default function CRMClients() {
             size="small"
             sx={{ minWidth: 150 }}
           >
-            <MenuItem value="">Todos</MenuItem>
+            <MenuItem value=""></MenuItem>
             {statuses.map((s) => (
               <MenuItem key={s.id} value={s.id}>
                 {s.name}
               </MenuItem>
             ))}
           </TextField>
-          <Button variant="contained" onClick={handleApply}>
+          <Button variant="contained" onClick={searchFilters}>
             Filtrar
           </Button>
           <Button variant="text" onClick={handleReset}>
             Limpiar
           </Button>
-          <IconButton onClick={() => fetchData()} aria-label="recargar">
+          <IconButton onClick={handleShowAll} aria-label="recargar">
             <RefreshIcon />
           </IconButton>
-
-          {/* Botón Nuevo: Solo cambia el estado true */}
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            onClick={() => setOpenDialog(true)}
-          >
-            Nuevo
-          </Button>
+          {addBtn()}
         </Stack>
 
         <Divider sx={{ my: 2 }} />
@@ -220,19 +278,17 @@ export default function CRMClients() {
             initialState={{
               pagination: { paginationModel: { pageSize: 10, page: 0 } },
             }}
-            onRowClick={(params) => navigate(`/crm/clientes/${params.id}`)}
           />
         </Box>
       </Box>
 
-      {/* Renderizamos el componente hijo segmentado */}
       <CreateClientDialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
         onSuccess={handleClientCreated}
         statuses={statuses}
       />
-      <Footer/>
+      <Footer />
     </>
   );
 }

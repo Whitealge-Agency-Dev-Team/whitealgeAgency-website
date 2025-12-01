@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -25,6 +25,26 @@ export default function InviteWorker() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [projects, setProjects] = useState([]);
+  const [projectId, setProjectId] = useState([]);
+
+  useEffect(() => {
+    const getProjects = async () => {
+      try {
+        const pro = await api.get('/projects');
+        const listProjects = Array.isArray(pro["projects"])
+          ? pro["projects"]
+          : Array.isArray(pro.data)
+          ? pro.data
+          : pro.data?.rows || [];
+
+        setProjects(listProjects);
+      } catch (error) {
+        setError(e.message || "No se pudo obtener los");
+      }
+    };
+    getProjects();
+  }, []);
 
   const onChange = (e) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -151,6 +171,20 @@ export default function InviteWorker() {
               <MenuItem value="T">Organizer (Team Manager)</MenuItem>
               <MenuItem value="W">Worker (Support Agent)</MenuItem>
             </TextField>
+
+            <TextField
+              select
+              label="Incluir en proyecto"
+              value={projectId}
+              onChange={(e) => setProjectId(e.target.value)}
+            >
+              {projects.map((project) => (
+                <MenuItem key={project.id} value={project.id}>
+                  {project.name}
+                </MenuItem>
+              ))}
+            </TextField>
+
             <Button type="submit" variant="contained" disabled={loading}>
               {loading ? "Enviando…" : "Enviar invitación"}
             </Button>

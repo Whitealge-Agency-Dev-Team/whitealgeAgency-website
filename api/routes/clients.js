@@ -8,7 +8,13 @@ const {
   endpointUpdate,
   endpointDelete,
 } = require("../controllers/handlers/endpointHandler");
-const { Client, Representative, Engage, Project } = require("../models/index");
+const {
+  Client,
+  Representative,
+  Engage,
+  Project,
+  Status,
+} = require("../models/index");
 
 // Formulario público para captación de clientes
 router.post(
@@ -24,7 +30,6 @@ router.post(
     ],
   })
 );
-
 // Endpoints protegidos
 router.use(authToken);
 
@@ -37,7 +42,7 @@ router.get("/", async (req, res) => {
         userId: user.id,
       },
     });
-    res.status(200).json(data);
+    res.status(200).json({clients: data, userRole: req.user.roleId});
   } catch (error) {
     console.error(`error: ${error}`);
   }

@@ -55,10 +55,10 @@ router.post("/login", async (req, res) => {
 });
 
 // Invitación a trabajador (admin/owner/organizer)
-router.post("/invite-worker", authToken, authRole("users", "create"), async (req, res) => {
+router.post("/invite-worker", authToken, async (req, res) => {
   try {
     const { email, phoneNumber = '', name = '', surname = '', roleCode = 'W' } = req.body;
-
+    
     const role = await Role.findOne({ where: { code: roleCode.toUpperCase() } });
     if (!role) return res.status(400).json({ message: "Código de rol inválido" });
 

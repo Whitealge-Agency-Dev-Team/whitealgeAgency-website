@@ -44,7 +44,16 @@ export default function CreateClientDialog({
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
-    const val = type === "number" ? Number(value) : value;
+    // Si es statusId, castear a número (o dejar "" si está vacío)
+    const val =
+      name === "statusId"
+        ? value === ""
+          ? ""
+          : Number(value)
+        : type === "number"
+        ? Number(value)
+        : value;
+
     setFormData((prev) => ({ ...prev, [name]: val }));
   };
 
@@ -177,7 +186,6 @@ export default function CreateClientDialog({
             />
           </Grid>
 
-          {/* 5. Estado */}
           <Grid item xs={12} sm={6}>
             <TextField
               select
@@ -187,11 +195,17 @@ export default function CreateClientDialog({
               onChange={handleChange}
               fullWidth
             >
-              {statuses.map((s) => (
-                <MenuItem key={s.id} value={s.id}>
-                  {s.name}
+              {statuses.length === 0 ? (
+                <MenuItem disabled value="">
+                  No hay estados disponibles
                 </MenuItem>
-              ))}
+              ) : (
+                statuses.map((s) => (
+                  <MenuItem key={s.id} value={s.id}>
+                    {s.name}
+                  </MenuItem>
+                ))
+              )}
             </TextField>
           </Grid>
         </Grid>

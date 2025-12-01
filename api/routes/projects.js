@@ -23,37 +23,10 @@ router.use(authToken); //(Endpoints protegidos, mis preciosos)
 // PROYECTOS
 router.get("/", async (req, res) => {
   try {
-    const { name, description, statusId } = req.query;
+    let u = await User.findByPk(req.user.id);
+    let projects = await u.getProjects();
 
-    // Filtros básicos de la tabla Project
-    const whereClause = {};
-    if (description) whereClause.description = description; // O usa Op.like para búsqueda parcial
-    if (statusId) whereClause.statusId = statusId;
-
-    // Lógica para filtrar por Usuario (Relación N:M)
-    // Si quieres que el usuario SOLO vea sus proyectos:
-    const userFilter = {
-      model: User,
-      where: { id: req.user.id }, // req.user.id viene del token
-      attributes: ["id", "email"], // Solo traemos datos necesarios
-      through: { attributes: [] }, // No traer datos de la tabla intermedia
-    };
-
-    // Si el usuario es admin y quieres que vea todo, podrías quitar el 'where' dentro del include.
-    // Asumiremos que solo ve SUS proyectos:
-
-    const projects = await Project.findAll({
-      where: whereClause,
-      include: [
-        userFilter, // <-- ESTO SOLUCIONA EL ERROR "no existe columna Project.userId"
-        {
-          model: Client, // Opcional: ver de qué cliente es
-          attributes: ["id", "companyName"],
-        },
-      ],
-    });
-
-    res.json(projects);
+    res.status(200).json({ projects: projects, userRole: req.user.roleId });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error al obtener proyectos" });
@@ -73,7 +46,6 @@ router.get("/:id", authRole("projects", "read"), async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  // 2. Aquí usamos 'sequelize' que ahora sí está importado
   const t = await sequelize.transaction();
 
   try {

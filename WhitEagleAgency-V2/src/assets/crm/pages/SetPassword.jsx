@@ -27,7 +27,7 @@ export default function SetPassword() {
       setLoading(true);
       await api.post('/auth/set-password', { token, newPassword: password }, { auth: false });
       setSuccess('¡Contraseña establecida! Ahora puedes iniciar sesión.');
-      setTimeout(() => navigate('/crm/login', { replace: true }), 1200);
+      setTimeout(() => navigate('/login', { replace: true }), 1200);
     } catch (e) {
       setError(e.message || 'No se pudo establecer la contraseña');
     } finally {
