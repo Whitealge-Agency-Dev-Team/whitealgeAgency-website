@@ -10,22 +10,23 @@ import {
   Grid,
   Alert,
 } from "@mui/material";
-import api from "../services/client"; 
+import api from "../services/client";
 
 export default function CreateProjectDialog({
   open,
   onClose,
   onSuccess,
   statuses = [],
-  clients = [] // Nueva prop: Lista de clientes para seleccionar
+  clients = {}
 }) {
   const initialProjectState = {
+    title: "",
     description: "",
-    estimatedFinish: "", // Formato YYYY-MM-DD
+    estimatedFinish: "",
     statusId: "",
-    clientId: "" // Opcional
+    clientId: ""
   };
-
+  const clientList = Array.isArray(clients.clients) ? clients.clients : [];
   const [formData, setFormData] = useState(initialProjectState);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -45,6 +46,7 @@ export default function CreateProjectDialog({
 
   const handleSubmit = async () => {
     // --- Validaciones ---
+    if (!formData.title) return setError("El nombre es obligatorio.");
     if (!formData.description) return setError("La descripción es obligatoria.");
     if (!formData.estimatedFinish) return setError("La fecha de finalización es obligatoria.");
     if (!formData.statusId) return setError("El estado inicial es obligatorio.");
@@ -61,13 +63,13 @@ export default function CreateProjectDialog({
 
       // --- CORRECCIÓN DE FLUJO (Evita error en consola) ---
       // 1. Avisamos al padre (refetch)
-      await onSuccess(); 
-      
+      await onSuccess();
+
       // 2. Apagamos carga ANTES de cerrar
       setLoading(false);
-      
+
       // 3. Cerramos el modal
-      onClose(); 
+      onClose();
 
     } catch (e) {
       const msg = e.response?.data?.message || e.message || "Error al crear proyecto";
@@ -88,6 +90,16 @@ export default function CreateProjectDialog({
         )}
 
         <Grid container spacing={2} sx={{ mt: 0 }}>
+          <Grid item xs={12}>
+            <TextField
+              autoFocus
+              name="title"
+              fullWidth
+              value={formData.title}
+              onChange={handleChange}
+              label="Titulo del proyecto"
+            />
+          </Grid>
           {/* 1. Descripción (Campo principal) */}
           <Grid item xs={12}>
             <TextField
@@ -103,7 +115,6 @@ export default function CreateProjectDialog({
               helperText={`${formData.description.length}/255 caracteres`}
             />
           </Grid>
-
           {/* 2. Fecha Estimada */}
           <Grid item xs={12} sm={6}>
             <TextField
@@ -137,7 +148,6 @@ export default function CreateProjectDialog({
             </TextField>
           </Grid>
 
-          {/* 4. Cliente (Opcional - Relación N:M) */}
           <Grid item xs={12}>
             <TextField
               select
@@ -151,7 +161,7 @@ export default function CreateProjectDialog({
               <MenuItem value="">
                 <em>Ninguno</em>
               </MenuItem>
-              {clients.map((c) => (
+              {clientList.map((c) => (
                 <MenuItem key={c.id} value={c.id}>
                   {c.companyName}
                 </MenuItem>

@@ -2,8 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { User, Role, Client } = require("../models/index");
-// const { validateUser } = require("../middlewares/validation/validateUser");
+const { User, Role, Client, Project } = require("../models/");
 const { authToken } = require("../middlewares/auth/authToken");
 const { authRole } = require("../middlewares/authorization/authRole");
 const { createTransporter } = require("../config/email");
@@ -57,7 +56,7 @@ router.post("/login", async (req, res) => {
 // Invitación a trabajador (admin/owner/organizer)
 router.post("/invite-worker", authToken, async (req, res) => {
   try {
-    const { email, phoneNumber = '', name = '', surname = '', roleCode = 'W' } = req.body;
+    const { email, phoneNumber = '', name = '', surname = '', roleCode = 'W', projectId} = req.body;
     
     const role = await Role.findOne({ where: { code: roleCode.toUpperCase() } });
     if (!role) return res.status(400).json({ message: "Código de rol inválido" });
@@ -75,6 +74,11 @@ router.post("/invite-worker", authToken, async (req, res) => {
       roleId: role.id,
       isActive: true
     });
+    
+    const project = Project.findByPk(projectId);
+    if (!project) return res.status(404).json({message: "Project not found"});
+
+    await project.setUsers(user);
 
     const setPassToken = jwt.sign({ type: 'set_password', id: user.id }, process.env.JWT_SECRET, { expiresIn: '24h' });
     const FRONT_URL = process.env.FRONT_URL || 'http://localhost:5173';

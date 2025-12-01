@@ -21,13 +21,12 @@ export default function InviteWorker() {
     surname: "",
     phoneNumber: "",
     roleCode: "W",
+    projectId: ""
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [projects, setProjects] = useState([]);
-  const [projectId, setProjectId] = useState([]);
-
   useEffect(() => {
     const getProjects = async () => {
       try {
@@ -35,10 +34,11 @@ export default function InviteWorker() {
         const listProjects = Array.isArray(pro["projects"])
           ? pro["projects"]
           : Array.isArray(pro.data)
-          ? pro.data
-          : pro.data?.rows || [];
+            ? pro.data
+            : pro.data?.rows || [];
 
         setProjects(listProjects);
+
       } catch (error) {
         setError(e.message || "No se pudo obtener los");
       }
@@ -60,7 +60,8 @@ export default function InviteWorker() {
       !form.name ||
       !form.surname ||
       !form.phoneNumber ||
-      !form.roleCode
+      !form.roleCode ||
+      !form.projectId
     ) {
       setError("Todos los campos son obligatorios.");
       return;
@@ -71,9 +72,11 @@ export default function InviteWorker() {
     try {
       setLoading(true);
       const res = await api.post("/auth/invite-worker", form);
+      console.log(form.projectId);
+
       setSuccess(
         res?.message ||
-          "Invitación enviada. Revisa la consola del servidor para el enlace de establecimiento de contraseña."
+        "Invitación enviada. Revisa la consola del servidor para el enlace de establecimiento de contraseña."
       );
       setForm({
         email: "",
@@ -81,6 +84,7 @@ export default function InviteWorker() {
         surname: "",
         phoneNumber: "",
         roleCode: "W",
+        projectId: ""
       });
     } catch (e) {
       setError(e.message || "No se pudo enviar la invitación");
@@ -173,14 +177,16 @@ export default function InviteWorker() {
             </TextField>
 
             <TextField
+              name="projectId"
               select
               label="Incluir en proyecto"
-              value={projectId}
-              onChange={(e) => setProjectId(e.target.value)}
+              value={form.projectId}
+              onChange={onChange}
+              required
             >
               {projects.map((project) => (
                 <MenuItem key={project.id} value={project.id}>
-                  {project.name}
+                  {project.title}
                 </MenuItem>
               ))}
             </TextField>

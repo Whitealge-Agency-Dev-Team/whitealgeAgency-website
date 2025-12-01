@@ -14,8 +14,6 @@ const {
   Objective,
   KeyDate,
   User,
-  Status,
-  Client,
 } = require("../models/index");
 
 router.use(authToken); //(Endpoints protegidos, mis preciosos)
@@ -25,7 +23,7 @@ router.get("/", async (req, res) => {
   try {
     let u = await User.findByPk(req.user.id);
     let projects = await u.getProjects();
-
+    
     res.status(200).json({ projects: projects, userRole: req.user.roleId });
   } catch (error) {
     console.error(error);
@@ -49,13 +47,14 @@ router.post("/", async (req, res) => {
   const t = await sequelize.transaction();
 
   try {
-    const { description, estimatedFinish, statusId, clientId } = req.body;
+    const { title, description, estimatedFinish, statusId, clientId } = req.body;
 
     const finalStatusId =
       statusId === "" || statusId === undefined ? null : parseInt(statusId);
 
     const newProject = await Project.create(
       {
+        title,
         description,
         estimatedFinish,
         statusId: finalStatusId,

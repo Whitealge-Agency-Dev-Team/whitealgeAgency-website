@@ -46,6 +46,12 @@ export default function CRMProjects() {
     () => [
       { field: "id", headerName: "ID", width: 60 },
       {
+        field: "title",
+        headerName: "Nombre",
+        flex: 1.5,
+        minWidth: 220,
+      },
+      {
         field: "description",
         headerName: "Descripción",
         flex: 1.5,
@@ -86,8 +92,7 @@ export default function CRMProjects() {
     if (userRole != 4)
       return (
         <Button
-          variant="contained"
-          color="primary"
+          variant="outlined"
           startIcon={<AddIcon />}
           onClick={handleOpenNew}
         >
@@ -166,7 +171,7 @@ export default function CRMProjects() {
         const [statusRes, clientRes, usersRes] = await Promise.all([
           api.get("/status").catch(() => []),
           api.get("/clients").catch(() => []),
-          api.get("/").catch(() => []),
+          // api.get("/").catch(() => []),
         ]);
 
         const statusList = Array.isArray(statusRes)
@@ -180,11 +185,10 @@ export default function CRMProjects() {
         });
         setStatusMap(map);
 
-        const clientList = Array.isArray(clientRes)
+        const clientList = Array.isArray(clientRes['clients'])
           ? clientRes
           : clientRes?.data || clientRes?.rows || [];
         setClients(clientList);
-
         const usersList = Array.isArray(usersRes)
           ? usersRes
           : usersRes?.data || usersRes?.rows || [];
@@ -248,6 +252,13 @@ export default function CRMProjects() {
         spacing={2}
         alignItems={{ xs: "stretch", sm: "center" }}
       >
+        <TextField
+          label="Nombre"
+          name="name"
+          value={filters.name}
+          onChange={handleChange}
+          size="small"
+        />
         <TextField
           label="Descripción"
           name="description"

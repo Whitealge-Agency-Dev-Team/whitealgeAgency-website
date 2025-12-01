@@ -5,6 +5,10 @@ const { DataTypes } = require("sequelize");
 const Project = sequelize.define(
   "Project",
   {
+    title: {
+      type: DataTypes.STRING(200),
+      allowNull: false,
+    },
     description: {
       type: DataTypes.STRING(255),
       allowNull: false,
