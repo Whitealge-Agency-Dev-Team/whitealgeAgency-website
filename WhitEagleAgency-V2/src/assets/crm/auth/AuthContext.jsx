@@ -29,8 +29,10 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const data = await api.post('/auth/login', { email, password }, { auth: false });
+
     if (data?.token) {
       localStorage.setItem('token', data.token);
+      localStorage.setItem('infoUser', data.user);
       const me = await api.get('/auth/me');
       setUser(me.user || null);
     }

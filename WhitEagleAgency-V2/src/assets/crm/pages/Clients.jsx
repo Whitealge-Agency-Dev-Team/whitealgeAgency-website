@@ -65,7 +65,7 @@ export default function CRMClients() {
     [statusMap]
   );
   const addBtn = () => {
-    if (userRole != 4)
+    if (userRole != 4 && userRole != 5)
       return (
         <Button
           variant="outlined"

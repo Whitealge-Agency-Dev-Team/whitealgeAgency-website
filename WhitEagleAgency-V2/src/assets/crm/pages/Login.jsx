@@ -1,25 +1,32 @@
-import { useState } from 'react';
-import { Box, Button, Container, TextField, Typography, Paper } from '@mui/material';
-import { useAuth } from '../auth/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import {
+  Box,
+  Button,
+  Container,
+  TextField,
+  Typography,
+  Paper,
+} from "@mui/material";
+import { useAuth } from "../auth/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function CRMLogin() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
     try {
       await login(email, password);
-      navigate('/crm/home', { replace: true });
+      navigate("/crm/home", { replace: true });
     } catch (err) {
-      setError(err?.message || 'Error al iniciar sesión');
+      setError(err?.message || "Error al iniciar sesión");
     } finally {
       setLoading(false);
     }
@@ -28,7 +35,9 @@ export default function CRMLogin() {
   return (
     <Container maxWidth="sm" sx={{ mt: 8 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
-        <Typography variant="h5" gutterBottom>Iniciar sesión</Typography>
+        <Typography variant="h5" gutterBottom>
+          Iniciar sesión
+        </Typography>
         <Box component="form" onSubmit={handleSubmit}>
           <TextField
             margin="normal"
@@ -49,7 +58,9 @@ export default function CRMLogin() {
             onChange={(e) => setPassword(e.target.value)}
           />
           {error && (
-            <Typography color="error" variant="body2" sx={{ mt: 1 }}>{error}</Typography>
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              {error}
+            </Typography>
           )}
           <Button
             type="submit"
@@ -58,12 +69,13 @@ export default function CRMLogin() {
             sx={{ mt: 2 }}
             disabled={loading}
           >
-            {loading ? 'Ingresando…' : 'Ingresar'}
+            {loading ? "Ingresando…" : "Ingresar"}
           </Button>
         </Box>
       </Paper>
       <Typography variant="body2" sx={{ mt: 2 }}>
-        ¿No tienes acceso? Debes completar primero el formulario de consulta en la página pública.
+        ¿No tienes acceso? Debes completar primero el formulario de consulta en
+        la página pública.
       </Typography>
     </Container>
   );

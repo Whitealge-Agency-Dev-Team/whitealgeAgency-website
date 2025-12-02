@@ -22,7 +22,6 @@ import CreateProjectDialog from "./newProject";
 import ProjectTeamDialog from "./ProjectDetail";
 
 export default function CRMProjects() {
-  const [ProjectBtn, setProjectBtn] = useState(false);
   const [userRole, setUserRole] = useState(null);
   const [rows, setRows] = useState([]);
   const [allRows, setAllRows] = useState([]);
@@ -31,7 +30,6 @@ export default function CRMProjects() {
   const [statusMap, setStatusMap] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [users, setUsers] = useState([]);
   const [teamUserIds, setTeamUserIds] = useState([]);
   const [teamDialogOpen, setTeamDialogOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -89,7 +87,7 @@ export default function CRMProjects() {
     [statusMap]
   );
   const addButton = () => {
-    if (userRole != 4)
+    if (userRole != 4 && userRole != 5)
       return (
         <Button
           variant="outlined"
@@ -121,7 +119,7 @@ export default function CRMProjects() {
       setAllRows(list);
     } catch (e) {
       console.error(e);
-      setError(e.message || "Error al cargar proyectos");
+      setError(e.message);
     } finally {
       setLoading(false);
     }
@@ -159,19 +157,13 @@ export default function CRMProjects() {
       setRows([]);
     }
   };
-  const handleSaveProjectTeam = async (projectId, userIds) => {
-    await api.post(`/projects/${projectId}/team`, {
-      userIds,
-    });
-  };
 
   useEffect(() => {
     async function fetchDependencies() {
       try {
-        const [statusRes, clientRes, usersRes] = await Promise.all([
+        const [statusRes, clientRes] = await Promise.all([
           api.get("/status").catch(() => []),
           api.get("/clients").catch(() => []),
-          // api.get("/").catch(() => []),
         ]);
 
         const statusList = Array.isArray(statusRes)
@@ -185,14 +177,10 @@ export default function CRMProjects() {
         });
         setStatusMap(map);
 
-        const clientList = Array.isArray(clientRes['clients'])
+        const clientList = Array.isArray(clientRes["clients"])
           ? clientRes
           : clientRes?.data || clientRes?.rows || [];
         setClients(clientList);
-        const usersList = Array.isArray(usersRes)
-          ? usersRes
-          : usersRes?.data || usersRes?.rows || [];
-        setUsers(usersList);
       } catch (e) {
         console.error("Error cargando dependencias", e);
       }
@@ -210,14 +198,6 @@ export default function CRMProjects() {
   const handleRowClick = async (params) => {
     const project = params.row;
     setSelectedProject(project);
-    try {
-      const res = await api.get(`/projects/${project.id}/`);
-      const teamList = res?.team || res?.data || res?.rows || [];
-      setTeamUserIds(teamList.map((u) => u.id));
-    } catch (e) {
-      console.error("Error cargando equipo del proyecto", e);
-      setTeamUserIds([]);
-    }
     setTeamDialogOpen(true);
   };
 
@@ -330,9 +310,9 @@ export default function CRMProjects() {
         open={teamDialogOpen}
         onClose={() => setTeamDialogOpen(false)}
         project={selectedProject}
-        users={users}
+        userRole={userRole}
         initialUserIds={teamUserIds}
-        onSave={handleSaveProjectTeam}
+        
       />
       <Footer />
     </Box>

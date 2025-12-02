@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -11,9 +10,9 @@ import {
   List,
   ListItemButton,
   ListItemText,
-  useTheme,
   Divider,
 } from "@mui/material";
+import { useState, useEffect } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close"; // Ícono para cerrar menú
 import { Link, useLocation } from "react-router-dom";
@@ -30,6 +29,16 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { logout } = useAuth(); // Para el botón de cerrar sesión
   const location = useLocation(); // Para saber en qué ruta estamos y "iluminar" el botón
+  const [data, setData] = useState("");
+  const filteredNavItems = navItems.filter((item) => {
+    if (data["role_id"] === 5 && item.label === "Clientes") {
+      return false;
+    }
+    return true;
+  });
+  useEffect(() => {
+    setData(localStorage.getItem("infoUser"));
+  },[]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -56,17 +65,19 @@ export default function Header() {
       </Typography>
       <Divider />
       <List>
-        {navItems.map((item) => (
-          <ListItemButton
-            key={item.label}
-            component={Link}
-            to={item.to}
-            onClick={handleDrawerToggle}
-          >
-            <ListItemText primary={item.label} />
-          </ListItemButton>
-        ))}
+        {filteredNavItems.map((item) => (
+            <ListItemButton
+              key={item.label}
+              component={Link}
+              to={item.to}
+              onClick={handleDrawerToggle}
+            >
+              <ListItemText primary={item.label} />
+            </ListItemButton>
+          ))}
+
         <Divider sx={{ my: 1 }} />
+
         <ListItemButton onClick={handleLogout}>
           <ListItemText primary="Cerrar Sesión" sx={{ color: "error.main" }} />
         </ListItemButton>

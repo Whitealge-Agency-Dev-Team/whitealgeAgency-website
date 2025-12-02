@@ -100,21 +100,6 @@ export default function CreateProjectDialog({
               label="Titulo del proyecto"
             />
           </Grid>
-          {/* 1. Descripción (Campo principal) */}
-          <Grid item xs={12}>
-            <TextField
-              autoFocus
-              label="Descripción del Proyecto *"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              fullWidth
-              multiline
-              rows={3}
-              inputProps={{ maxLength: 255 }}
-              helperText={`${formData.description.length}/255 caracteres`}
-            />
-          </Grid>
           {/* 2. Fecha Estimada */}
           <Grid item xs={12} sm={6}>
             <TextField
@@ -168,8 +153,21 @@ export default function CreateProjectDialog({
               ))}
             </TextField>
           </Grid>
-
         </Grid>
+        <Grid item xs={12}>
+            <TextField
+              autoFocus
+              label="Descripción del Proyecto *"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              fullWidth
+              multiline
+              rows={3}
+              inputProps={{ maxLength: 255 }}
+              helperText={`${formData.description.length}/255 caracteres`}
+            />
+          </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="inherit">
