@@ -9,6 +9,7 @@ const Permission = require("./user/role/permission");
 const Resource = require("./user/role/resource");
 const RolePermissionResource = require("./user/role/rolePermissionResource");
 
+
 const Project = require("./project/project");
 const ProjectDimiss = require("./project/projectDimiss");
 const Objective = require("./project/objective");
@@ -40,22 +41,24 @@ Role.hasMany(User);
 User.belongsTo(Role, { foreignKey: "roleId" });
 
 User.hasMany(Salary);
-Salary.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
+Salary.belongsTo(User, { foreignKey: "userId", onDelete: "RESTRICT" });
 
 User.hasMany(UserDimiss);
 UserDimiss.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
 
 User.belongsToMany(Project, {
-  through: "user_project",
-  foreignKey: "userId",
-  otherKey: "projectId",
+  through: "userProject",
+  foreignKey: "user_id",
+  otherKey: "project_id",
   onDelete: "CASCADE",
+  as: "projects"
 });
 Project.belongsToMany(User, {
-  through: "user_project",
-  foreignKey: "projectId",
-  otherKey: "userId",
-  onDelete: "RESTRICT",
+  through: "userProject",
+  foreignKey: "project_id",
+  otherKey: "user_id",
+  onDelete: "CASCADE",
+  as: 'users'
 });
 
 Project.hasMany(ProjectDimiss);
@@ -102,8 +105,14 @@ Engage.belongsToMany(Client, {
   onDelete: "CASCADE",
 });
 
+User.hasMany(Client, { foreignKey: "userId" });
+Client.belongsTo(User, { foreignKey: "userId" });
+
 Representative.hasMany(Interview);
-Interview.belongsTo(Representative, { foreignKey: "representativeId" });
+Interview.belongsTo(Representative, {
+  foreignKey: "representativeId",
+  onDelete: "CASCADE",
+});
 
 Interview.hasMany(Note);
 Note.belongsTo(Interview, { foreignKey: "interviewId", onDelete: "CASCADE" });

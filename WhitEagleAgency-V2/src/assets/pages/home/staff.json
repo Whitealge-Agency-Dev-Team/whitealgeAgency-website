@@ -1,0 +1,41 @@
+[
+  {
+    "name": "Roberto Donato",
+    "image": "src/assets/images/personal/Donato.jpg",
+    "assets": [
+      "Lic. en marketing.",
+      "Consultor en marketing estratégico y operativo.",
+      "Asesor de inversiones.",
+      "Docente unversiatario."
+    ]
+  },
+  {
+    "name": "Sindy Szczucky",
+    "image": "src/assets/images/personal/Sindy.jpg",
+    "assets": [
+      "Lic. en marketing.",
+      "Analista en marketing estratégico.",
+      "Responsable creativa de redes sociales.",
+      "Planificadora de medios."
+    ]
+  },
+  {
+    "name": "Diego Sánchez",
+    "image": "src/assets/images/personal/Diego.jpg",
+    "assets": [
+      "Lic. en marketing.",
+      "Asesor de grupos bancarios.",
+      "Desarrollador de cartera, intangibles financieros en el mercado."
+    ]
+  },
+
+  {
+    "name": "Sebastian Rey",
+    "image": "src/assets/images/personal/Rey.jpg",
+    "assets": [
+      "Lic. en marketing.",
+      "Experiencia en marketing estratégico.",
+      "Analista de pronósticos operativos."
+    ]
+  }
+]

@@ -2,20 +2,21 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { User, Role, Client } = require("../models/index");
-// const { validateUser } = require("../middlewares/validation/validateUser");
+const { User, Role, Client, Project } = require("../models/");
 const { authToken } = require("../middlewares/auth/authToken");
 const { authRole } = require("../middlewares/authorization/authRole");
+const { createTransporter } = require("../config/email");
+const nodemailer = require("nodemailer");
+const sequelize = require("../config/database");
 
-// Login (se puede remover, ya que había otro en funcionamiento)
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ 
+    const user = await User.findOne({
       where: { email },
-      include: [{ model: Role }]
+      include: [{ model: Role }],
     });
-    
+
     if (!user) {
       return res.status(401).json({ message: "Credenciales inválidas" });
     }
@@ -26,11 +27,11 @@ router.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign(
-      { 
-        id: user.id, 
-        email: user.email, 
+      {
+        id: user.id,
+        email: user.email,
         roleId: user.roleId,
-        role: user.Role ? user.Role.code : undefined
+        role: user.Role ? user.Role.code : undefined,
       },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
@@ -44,8 +45,8 @@ router.post("/login", async (req, res) => {
         name: user.name,
         surname: user.surname,
         role_id: user.roleId,
-        role: user.Role ? user.Role.code : undefined
-      }
+        role: user.Role ? user.Role.code : undefined,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -54,35 +55,73 @@ router.post("/login", async (req, res) => {
 });
 
 // Invitación a trabajador (admin/owner/organizer)
-router.post("/invite-worker", authToken, authRole("users", "create"), async (req, res) => {
+router.post("/invite-worker", authToken, async (req, res) => {
+  const t = await sequelize.transaction();
   try {
-    const { email, phoneNumber = '', name = '', surname = '', roleCode = 'W' } = req.body;
+    const {
+      email,
+      phoneNumber = "",
+      name = "",
+      surname = "",
+      roleCode = "W",
+      projectId,
+    } = req.body;
 
-    const role = await Role.findOne({ where: { code: roleCode.toUpperCase() } });
-    if (!role) return res.status(400).json({ message: "Código de rol inválido" });
+    const role = await Role.findOne({
+      where: { code: roleCode.toUpperCase() },
+    });
+    if (!role)
+      return res.status(400).json({ message: "Código de rol inválido" });
 
     // Generar token de set-password y contraseña temporal aleatoria
     const tempPassword = Math.random().toString(36).slice(-10);
     const hashedPassword = await bcrypt.hash(tempPassword, 12);
 
-    const user = await User.create({
-      email,
-      phoneNumber,
-      name,
-      surname,
-      passwordHash: hashedPassword,
-      roleId: role.id,
-      isActive: true
-    });
+    const user = await User.create(
+      {
+        email,
+        phoneNumber,
+        name,
+        surname,
+        passwordHash: hashedPassword,
+        roleId: role.id,
+        isActive: true,
+      },
+      { transaction: t }
+    );
+    
+    const project = await Project.findByPk(projectId, { transaction: t });
+    if (!project) return res.status(404).json({ message: "Project not found" });
 
-    const setPassToken = jwt.sign({ type: 'set_password', id: user.id }, process.env.JWT_SECRET, { expiresIn: '24h' });
-    const FRONT_URL = process.env.FRONT_URL || 'http://localhost:5173';
+    await project.addUser(user, { transaction: t });
+
+    const setPassToken = jwt.sign(
+      { type: "set_password", id: user.id },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+    const FRONT_URL = process.env.FRONT_URL || "http://localhost:5173";
     const link = `${FRONT_URL}/crm/set-password?token=${setPassToken}`;
 
-    console.log(`[INVITE] Enviar a ${email}: Estás invitado al CRM. Establece tu contraseña aquí: ${link}`);
+    const transporter = await createTransporter();
 
-    res.status(201).json({ message: "Invitación enviada (consola)", userId: user.id });
+    const mail = await transporter.sendMail({
+      to: email,
+      subject: "Inivtación a proyecto",
+      html: `<p>Estás invitado al CRM. Establece tu contraseña aquí: <a href="${link}" target="_blank">click aquí</a></p>`,
+    });
+    console.log(
+      `[INVITE] Enviar a ${email}: Estás invitado al CRM. Establece tu contraseña aquí: ${link}`
+    );
+
+    await t.commit();
+    res.status(201).json({
+      message: "Invitación enviada (consola)",
+      userId: user.id,
+      url: nodemailer.getTestMessageUrl(mail),
+    });
   } catch (error) {
+    await t.rollback();
     console.error(error);
     res.status(500).json({ message: "Error al invitar trabajador" });
   }
@@ -92,30 +131,36 @@ router.post("/invite-worker", authToken, authRole("users", "create"), async (req
 router.post("/register-client", authToken, async (req, res) => {
   try {
     const { email, name, surname, clientId } = req.body;
-    
-    const clientRole = await Role.findOne({ where: { code: 'C' } }); // C de cliente
+
+    const clientRole = await Role.findOne({ where: { code: "C" } }); // C de cliente
     const tempPassword = Math.random().toString(36).slice(-10);
-    
+
     const hashedPassword = await bcrypt.hash(tempPassword, 12);
-    
+
     const user = await User.create({
       email,
       name,
       surname,
       passwordHash: hashedPassword,
       roleId: clientRole.id,
-      isActive: true
+      isActive: true,
     });
 
     // Enviar link de set-password (consola)
-    const setPassToken = jwt.sign({ type: 'set_password', id: user.id }, process.env.JWT_SECRET, { expiresIn: '24h' });
-    const FRONT_URL = process.env.FRONT_URL || 'http://localhost:5173';
+    const setPassToken = jwt.sign(
+      { type: "set_password", id: user.id },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+    const FRONT_URL = process.env.FRONT_URL || "http://localhost:5173";
     const link = `${FRONT_URL}/crm/set-password?token=${setPassToken}`;
-    console.log(`[INVITE] Cliente aceptado ${email}. Establece tu contraseña aquí: ${link}`);
+    console.log(
+      `[INVITE] Cliente aceptado ${email}. Establece tu contraseña aquí: ${link}`
+    );
 
-    res.status(201).json({ 
+    res.status(201).json({
       message: "Cliente registrado exitosamente (invitación en consola)",
-      userId: user.id
+      userId: user.id,
     });
   } catch (error) {
     console.error(error);
@@ -127,15 +172,15 @@ router.post("/register-client", authToken, async (req, res) => {
 router.get("/me", authToken, async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
-      attributes: { exclude: ['passwordHash'] },
-      include: [{ model: Role }]
+      attributes: { exclude: ["passwordHash"] },
+      include: [{ model: Role }],
     });
-    
+
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
-    
-    res.json({user});
+
+    res.json({ user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error al obtener perfil" });
@@ -146,15 +191,15 @@ router.put("/upload_me", authToken, async (req, res) => {
   try {
     const { name, surname, phoneNumber, email } = req.body;
     const allowedFields = { name, surname, phoneNumber, email };
-    
-    Object.keys(allowedFields).forEach(key => {
+
+    Object.keys(allowedFields).forEach((key) => {
       if (allowedFields[key] === undefined) {
         delete allowedFields[key];
       }
     });
-    
+
     await User.update(allowedFields, { where: { id: req.user.id } });
-    
+
     res.json({ message: "Perfil actualizado exitosamente" });
   } catch (error) {
     console.error(error);
@@ -166,7 +211,10 @@ router.put("/upload_me", authToken, async (req, res) => {
 router.post("/set-password", async (req, res) => {
   try {
     const { token, newPassword } = req.body;
-    if (!token || !newPassword) return res.status(400).json({ message: "Token y nueva contraseña son requeridos" });
+    if (!token || !newPassword)
+      return res
+        .status(400)
+        .json({ message: "Token y nueva contraseña son requeridos" });
 
     let payload;
     try {
@@ -175,12 +223,15 @@ router.post("/set-password", async (req, res) => {
       return res.status(400).json({ message: "Token inválido o expirado" });
     }
 
-    if (payload.type !== 'set_password' || !payload.id) {
+    if (payload.type !== "set_password" || !payload.id) {
       return res.status(400).json({ message: "Token inválido" });
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 12);
-    await User.update({ passwordHash: hashedPassword }, { where: { id: payload.id } });
+    await User.update(
+      { passwordHash: hashedPassword },
+      { where: { id: payload.id } }
+    );
 
     return res.json({ message: "Contraseña actualizada exitosamente" });
   } catch (error) {
@@ -190,25 +241,72 @@ router.post("/set-password", async (req, res) => {
 });
 
 // Cambiar contraseña (usuario autenticado)
-router.post('/change-password', authToken, async (req, res) => {
+router.post("/change-password", authToken, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
-    if (!currentPassword || !newPassword) return res.status(400).json({ message: 'La contraseña actual y la nueva son obligatorias' });
-    if (String(newPassword).length < 8) return res.status(400).json({ message: 'La nueva contraseña debe tener al menos 8 caracteres' });
+    if (!currentPassword || !newPassword)
+      return res
+        .status(400)
+        .json({ message: "La contraseña actual y la nueva son obligatorias" });
+    if (String(newPassword).length < 8)
+      return res.status(400).json({
+        message: "La nueva contraseña debe tener al menos 8 caracteres",
+      });
 
     const user = await User.findByPk(req.user.id);
-    if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+    if (!user)
+      return res.status(404).json({ message: "Usuario no encontrado" });
 
     const valid = await bcrypt.compare(currentPassword, user.passwordHash);
-    if (!valid) return res.status(401).json({ message: 'Contraseña actual incorrecta' });
+    if (!valid)
+      return res.status(401).json({ message: "Contraseña actual incorrecta" });
 
     const hashed = await bcrypt.hash(newPassword, 12);
     await User.update({ passwordHash: hashed }, { where: { id: user.id } });
 
-    return res.json({ message: 'Contraseña actualizada' });
+    return res.json({ message: "Contraseña actualizada" });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Error al cambiar la contraseña' });
+    return res.status(500).json({ message: "Error al cambiar la contraseña" });
+  }
+});
+
+router.post("/sendConsult", async (req, res) => {
+  try {
+    const {
+      nombreEmpresa,
+      emailEmpresa,
+      telefonoEmpresa,
+      industriaEmpresa,
+      descEmpresa,
+    } = req.body;
+
+    const transporter = await createTransporter();
+
+    const mail = await transporter.sendMail({
+      to: "federicocoronado2006@gmail.com",
+      subject: "Solicitud de servicios (nuevo cliente)",
+      html: `
+      <h1>
+        ¿Quiere aceptar a un nuevo cliente?
+      </h1>
+      <p>Nombre: ${nombreEmpresa}</p>      
+      <p>Contacto:</p>      
+      <p>Email: ${emailEmpresa} </p>      
+      <p>Telefono: ${telefonoEmpresa} </p>      
+      <p>Sector industrial: ${industriaEmpresa}</p>      
+      <p>Problemática que enfrenta "${nombreEmpresa}": ${descEmpresa}</p>      
+      <a href="http://localhost:5173/">SI</a> 
+      <a href="http://localhost:5173/">NO</a>
+      `,
+    });
+    res.json({
+      message: "Sent ;:)",
+      status: 200,
+      ulr: nodemailer.getTestMessageUrl(mail),
+    });
+  } catch (error) {
+    console.error(error);
   }
 });
 

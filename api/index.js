@@ -36,11 +36,6 @@ server.use('/clients', clientRoutes);
 server.use('/projects', projectRoutes);
 server.use('/status', statusRoutes);
 
-// Ruta de salud (healthy route)
-server.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Servidor funcionando correctamente' });
-});
-
 sequelize
   .sync({ force: false })
   .then(() => {
