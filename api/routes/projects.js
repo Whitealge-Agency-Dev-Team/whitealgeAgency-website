@@ -51,7 +51,7 @@ router.post("/", async (req, res) => {
 
     const finalStatusId =
       statusId === "" || statusId === undefined ? null : parseInt(statusId);
-
+    
     const newProject = await Project.create(
       {
         title,

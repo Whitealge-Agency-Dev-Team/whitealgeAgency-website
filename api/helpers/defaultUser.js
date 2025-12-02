@@ -125,11 +125,11 @@ async function defaultUser() {
     });
 
     // Usuario con rol cliente (se crea aparte del lead, para login)
-    const [clientUser] = await User.findOrCreate({
+    await User.findOrCreate({
       where: { email: "cliente.demo@demo.com" },
       defaults: {
         email: "cliente.demo@demo.com",
-        phoneNumber: "1100000004",
+        phoneNumber: "1115112191",
         name: "Claudio",
         surname: "Cliente",
         passwordHash: demoPassHash,
