@@ -72,7 +72,6 @@ export default function InviteWorker() {
     try {
       setLoading(true);
       const res = await api.post("/auth/invite-worker", form);
-      console.log(form.projectId);
 
       setSuccess(
         res?.message ||

@@ -22,6 +22,7 @@ import ClientDetail from "./assets/crm/pages/ClientDetail.jsx";
 import ProjectDetail from "./assets/crm/pages/ProjectDetail.jsx";
 import InviteWorker from "./assets/crm/pages/InviteWorker.jsx";
 import CRMChart from "./assets/crm/pages/ChartOrganization.jsx";
+import ConfirmClient from "./assets/crm/pages/ConfirmClient.jsx";
 const theme = createTheme();
 
 export default function App() {
@@ -57,6 +58,7 @@ export default function App() {
             </Route>
           </Route>
           <Route path="*" element={<NoPage />} />
+          <Route path="/confirm-client" element={<ConfirmClient />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
