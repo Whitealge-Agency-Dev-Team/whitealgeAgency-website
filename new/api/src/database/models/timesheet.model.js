@@ -6,6 +6,7 @@ const Timesheet = sequelize.define(
   {
     id: {
       type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     taskId: {

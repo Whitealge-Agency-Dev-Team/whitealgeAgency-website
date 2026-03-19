@@ -35,7 +35,7 @@ Log.belongsTo(Associate, { foreignKey: "associate_id" });
 Associate.hasMany(Transaction, { foreignKey: "associate_id" });
 Transaction.belongsTo(Associate, { foreignKey: "associate_id" });
 
-models = {
+module.exports = {
   User,
   Transaction,
   Timesheet,
@@ -46,5 +46,3 @@ models = {
   Log,
   Associate,
 };
-
-module.exports = models;
