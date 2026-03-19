@@ -1,16 +1,18 @@
-require("dotenv-safe").config()
-const { Sequelize } = require("sequelize")
-
+require("dotenv-safe").config();
+const { Sequelize } = require("sequelize");
 
 const sequelize = new Sequelize(
-    process.env.DB_NAME,
-    process.env.DB_USERNAME,
-    process.env.DB_PASSWORD,
-    {
-        host: process.env.DB_HOST | "localhost",
-        dialect: "postgres",
-        logging: console.log
+  process.env.DB_NAME,
+  process.env.DB_USERNAME,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST | "localhost",
+    dialect: "postgres",
+    logging: console.log,
+    define: {
+      underscored: true
     }
-)
+  },
+);
 
-module.exports = sequelize
+module.exports = sequelize;

@@ -1,32 +1,27 @@
-const sequelize = require("../config")
-const { DataTypes } = require("sequelize")
+const sequelize = require("../config");
+const { DataTypes } = require("sequelize");
 
-const Permission = sequelize.define(
-    "Permission",
-    {
-        roleId: {
-            type: DataTypes.UUID,
-            allowNull: false,
-            primaryKey: true,
-            references: {
-                model: "Role",
-                key: "id"
-            }
-        },
-        action: {
-            type: DataTypes.ENUM("C", "R", "U", "D"),
-            allowNull: false,
-            primaryKey: true
-        },
-        resource: {
-            type: DataTypes.ENUM(""),
-            allowNull: false,
-            primaryKey: true
-        }
+const Permission = sequelize.define("Permission", {
+  roleId: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    primaryKey: true,
+    references: {
+      model: "roles",
+      key: "id",
     },
-    {
-        underscored: true
-    }
-)
+    onDelete: "CASCADE",
+  },
+  action: {
+    type: DataTypes.ENUM("CREATE", "READ", "UPDATE", "DELETE"),
+    allowNull: false,
+    primaryKey: true,
+  },
+  resource: {
+    type: DataTypes.ENUM(""),
+    allowNull: false,
+    primaryKey: true,
+  },
+});
 
-module.exports = Permission
+module.exports = Permission;
