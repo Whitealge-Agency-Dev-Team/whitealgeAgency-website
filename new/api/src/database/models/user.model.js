@@ -49,7 +49,7 @@ const User = sequelize.define(
   },
 );
 
-User.prototype.comparePassword = async function () {
+User.prototype.comparePassword = async function (password) {
   return compare(password, this.passwordHash);
 };
 

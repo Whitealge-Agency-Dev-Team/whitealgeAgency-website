@@ -12,10 +12,14 @@
   "type": "commonjs",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv-safe": "^9.1.0",
     "express": "^5.2.1",
+    "joi": "^18.0.2",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.20.0",
-    "sequelize": "^6.37.8"
+    "sequelize": "^6.37.8",
+    "ua-parser-js": "^2.0.9"
   }
 }

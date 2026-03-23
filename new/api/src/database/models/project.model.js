@@ -9,14 +9,6 @@ const Project = sequelize.define(
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    clientId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: "clients",
-        key: "id",
-      },
-    },
     title: {
       type: DataTypes.STRING(50),
       allowNull: false,

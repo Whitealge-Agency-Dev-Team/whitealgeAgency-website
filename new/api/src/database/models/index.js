@@ -7,6 +7,7 @@ const Project = require("./project.model");
 const Permission = require("./permission.model");
 const Log = require("./log.model");
 const Associate = require("./associate.model");
+const Token = require("./token.model")
 
 Role.hasMany(Permission, { foreignKey: "role_id" });
 Permission.belongsTo(Role, { foreignKey: "role_id" });
@@ -16,6 +17,9 @@ Associate.belongsTo(Role, { foreignKey: "role_id" });
 
 Project.hasMany(Associate, { foreignKey: "project_id" });
 Associate.belongsTo(Project, { foreignKey: "project_id" });
+
+User.hasMany(Token, {foreignKey: "user_id"});
+Token.belongsTo(User, {foreignKey: "user_id"})
 
 User.hasMany(Associate, { foreignKey: "user_id" });
 Associate.belongsTo(User, { foreignKey: "user_id" });
@@ -35,6 +39,7 @@ Log.belongsTo(Associate, { foreignKey: "associate_id" });
 Associate.hasMany(Transaction, { foreignKey: "associate_id" });
 Transaction.belongsTo(Associate, { foreignKey: "associate_id" });
 
+
 module.exports = {
   User,
   Transaction,
@@ -45,4 +50,5 @@ module.exports = {
   Permission,
   Log,
   Associate,
+  Token
 };
