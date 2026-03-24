@@ -1,4 +1,5 @@
 require("dotenv-safe").config();
+const createError = require("http-errors");
 const jwt = require("jsonwebtoken");
 
 const authToken = async (req, _res, next) => {
@@ -6,18 +7,19 @@ const authToken = async (req, _res, next) => {
     const header = req.headers["authorization"];
     const token = header?.split(" ")[1];
 
-    if (!token) {
-      const error = new Error("No token provided");
-      error.status = 401;
-      return next(error);
-    }
+    if (!token) throw createError(401, "No token provided");
 
-    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+    } catch (error) {
+      throw createError(401, error)
+    }
 
     req.user = { id: decoded.userId };
     return next();
   } catch (error) {
-    return next(error);
+    next(error);
   }
 };
 
