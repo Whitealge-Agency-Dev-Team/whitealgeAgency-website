@@ -38,14 +38,19 @@ const User = sequelize.define(
     },
     password: {
       type: DataTypes.VIRTUAL,
-      async set(value) {
-        this.setDataValue("passwordHash", hash(value, genSalt()));
-      },
     },
   },
   {
     timestamps: true,
-    paranoid: true
+    paranoid: true,
+    hooks: {
+      beforeValidate: async (instance) => {
+        if (instance.password) {
+          const salt = await genSalt();
+          instance.passwordHash = await hash(instance.password, salt);
+        }
+      },
+    },
   },
 );
 

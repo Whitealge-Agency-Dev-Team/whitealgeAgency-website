@@ -1,9 +1,9 @@
-const { loginSchema, registerSchema } = require("../schemas/user.schema");
+const { loginSchema, registerSchema } = require("../schemas/auth.schema");
 const { User, Token } = require("../database/models");
 const UAParser = require("ua-parser-js");
 const jwt = require("jsonwebtoken");
 
-const refresh = async (req, res) => {
+const refresh = async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken)
@@ -11,10 +11,12 @@ const refresh = async (req, res) => {
 
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
-    const foundToken = await Token.scope("active").findByPk(decoded.tokenId);
+    const foundToken = await Token.findByPk(decoded.tokenId);
 
-    if (!foundToken)
+    if (!foundToken?.isValid) {
+      if (foundToken) await Token.destroy({ where: { id: foundToken.id } });
       return res.status(401).json({ message: "Expired or invalid session" });
+    }
 
     const accessToken = jwt.sign(
       { userId: foundToken.userId },
@@ -24,7 +26,24 @@ const refresh = async (req, res) => {
 
     return res.status(200).json({ accessToken });
   } catch (error) {
-    return res.status(401).json({ message: "Invalid refresh token" });
+    return next(error);
+  }
+};
+
+const logout = async (req, res, next) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken)
+      return res.status(401).json({ message: "No token provided" });
+
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    await Token.destroy({ where: { id: decoded.tokenId } });
+
+    res.clearCookie("refreshToken");
+
+    return res.status(200);
+  } catch (error) {
+    return next(error);
   }
 };
 
@@ -33,7 +52,7 @@ const generateTokens = async (userId, userAgent, res) => {
     expiresIn: "15m",
   });
   const uaResult = new UAParser(userAgent).getResult();
-  const device = `${uaResult.browser.name} ${uaResult.browser.major} on ${uaResult.os.name}`;
+  const device = `${uaResult.browser.name} ${uaResult.browser.major} - ${uaResult.os.name}`;
 
   const token = await Token.create({
     userId,
@@ -57,14 +76,14 @@ const generateTokens = async (userId, userAgent, res) => {
   return accessToken;
 };
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   try {
     const { error, value } = loginSchema.validate(req.body);
     if (error)
       return res.status(400).json({ message: error.details[0].message });
 
     const foundUser = await User.findOne({ where: { email: value.email } });
-    if (!foundUser || !(await foundUser.comparePassword(value.password)))
+    if (!(await foundUser?.comparePassword(value.password)))
       return res.status(401).json({ message: "Invalid credentials" });
 
     const accessToken = await generateTokens(
@@ -75,31 +94,36 @@ const login = async (req, res) => {
 
     return res.status(200).json({ accessToken });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Internal Server Error", debug: error });
+    return next(error);
   }
 };
 
-const register = async (req, res) => {
+const register = async (req, res, next) => {
   try {
     const { error, value } = registerSchema.validate(req.body);
-    if (error)
-      return res.status(400).json({ message: error.details[0].message });
+    if (error) {
+      error.status = 401;
+      return next(error);
+    }
 
-    const newUser = await User.create({ ...value });
+    const { password, ...filteredValue } = value;
+    const [user, created] = await User.findOrCreate({
+      where: filteredValue,
+      defaults: value,
+    });
+
+    if (!created) return res.status(409).json({ message: "Existing user" });
+
     const accessToken = await generateTokens(
-      newUser.id,
+      user.id,
       req.headers["user-agent"],
       res,
     );
 
     return res.status(200).json({ accessToken });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Internal Server Error", debug: error });
+    return next(error);
   }
 };
 
-module.exports = { login, refresh, register };
+module.exports = { login, refresh, register, logout };

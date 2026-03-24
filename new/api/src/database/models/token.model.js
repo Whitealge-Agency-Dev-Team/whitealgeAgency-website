@@ -25,16 +25,15 @@ const Token = sequelize.define(
       type: DataTypes.DATE,
       allowNull: false,
     },
+    isValid: {
+      type: DataTypes.VIRTUAL,
+      async get() {
+        return this.expiredAt > new Date();
+      },
+    },
   },
   {
     timestamps: true,
-    scopes: {
-      active: {
-        where: {
-          expiredAt: { [Op.gt]: new Date() },
-        },
-      },
-    },
     hooks: {
       beforeCreate: async (instance) => {
         await instance.constructor.destroy({

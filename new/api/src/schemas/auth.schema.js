@@ -9,15 +9,8 @@ const fields = {
 };
 const password = Joi.string().min(11).required();
 
-const userSchema = Joi.object({
-  ...fields,
-  createdAt: Joi.date().required(),
-  updatedAt: Joi.date().required(),
-  deletetAt: Joi.date(),
-});
-
 const loginSchema = Joi.object({ email: fields.email, password });
 
 const registerSchema = Joi.object({ ...fields, password });
 
-module.exports = { userSchema, loginSchema, registerSchema };
+module.exports = { loginSchema, registerSchema };
