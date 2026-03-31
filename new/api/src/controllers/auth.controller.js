@@ -1,7 +1,6 @@
 const { loginSchema, registerSchema } = require("../schemas/auth.schema");
 const createError = require("http-errors");
 const { User, Token } = require("../database/models");
-const UAParser = require("ua-parser-js");
 const jwt = require("jsonwebtoken");
 
 const generateTokens = async (userId, res, device = "Unknown") => {
@@ -99,8 +98,7 @@ const register = async (req, res, next) => {
     const { error, value } = registerSchema.validate(req.body);
     if (error) throw createError(401, error);
 
-    const newUser = await User.create( value, { attributes: { exclude: ["passwordHash"] } } );
-
+    const newUser = await User.create(value);
     const accessToken = await generateTokens( newUser.id, res, req.device );
 
     return res.status(200).json({ accessToken });
