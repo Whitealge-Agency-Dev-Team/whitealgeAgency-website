@@ -4,19 +4,14 @@ const { User, Token } = require("../database/models");
 const UAParser = require("ua-parser-js");
 const jwt = require("jsonwebtoken");
 
-const generateTokens = async (userId, userAgent = null, res) => {
+const generateTokens = async (userId, res, device = "Unknown") => {
   const accessToken = jwt.sign({ userId }, process.env.JWT_ACCESS_SECRET, {
     expiresIn: "15m",
-  });
-
-  if (!userAgent) {
-    const uaResult = new UAParser(userAgent).getResult();
-    userAgent = `${uaResult.browser.name} ${uaResult.browser.major} - ${uaResult.os.name}`;
-  }
+  }); 
 
   const token = await Token.create({
     userId,
-    userAgent,
+    device,
     expiredAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
   });
 
@@ -55,7 +50,7 @@ const refresh = async (req, res, next) => {
 
     await foundToken.destroy();
 
-    const accessToken = await generateTokens(userId, device, res);
+    const accessToken = await generateTokens(userId, res, device);
 
     return res.status(200).json({ accessToken });
   } catch (error) {
@@ -66,14 +61,13 @@ const refresh = async (req, res, next) => {
 const logout = async (req, res, next) => {
   try {
     const { refreshToken } = req.cookies;
-    if (!refreshToken) throw createError(401, "No token provided");
-
     res.clearCookie("refreshToken");
-    try {
-      const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-      await Token.destroy({ where: { id: decoded.tokenId } });
-    } catch (error) {
-      throw createError(401, error);
+
+    if (refreshToken) {
+      try {
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+        await Token.destroy({ where: { id: decoded.tokenId } });
+      } catch (error) {}
     }
 
     return res.sendStatus(200);
@@ -92,11 +86,7 @@ const login = async (req, res, next) => {
     if (!(await foundUser?.comparePassword(value.password)))
       throw createError(401, "Invalid credentials");
 
-    const accessToken = await generateTokens(
-      foundUser.id,
-      req.headers["user-agent"],
-      res,
-    );
+    const accessToken = await generateTokens( foundUser.id, res, req.device );
 
     return res.status(200).json({ accessToken });
   } catch (error) {
@@ -109,19 +99,9 @@ const register = async (req, res, next) => {
     const { error, value } = registerSchema.validate(req.body);
     if (error) throw createError(401, error);
 
-    const { password, ...filteredValue } = value;
-    const [user, created] = await User.findOrCreate({
-      where: filteredValue,
-      defaults: value,
-    });
+    const newUser = await User.create( value, { attributes: { exclude: ["passwordHash"] } } );
 
-    if (!created) throw createError(409, "Existing user");
-
-    const accessToken = await generateTokens(
-      user.id,
-      req.headers["user-agent"],
-      res,
-    );
+    const accessToken = await generateTokens( newUser.id, res, req.device );
 
     return res.status(200).json({ accessToken });
   } catch (error) {
