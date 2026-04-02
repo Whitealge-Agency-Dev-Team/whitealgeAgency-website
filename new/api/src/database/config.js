@@ -11,7 +11,8 @@ const sequelize = new Sequelize(
     dialect: "postgres",
     logging: false,
     define: {
-      underscored: true
+      underscored: true,
+      paranoid: true
     }
   },
 );

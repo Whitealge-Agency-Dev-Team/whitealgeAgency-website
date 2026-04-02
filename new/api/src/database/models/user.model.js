@@ -18,15 +18,14 @@ const User = sequelize.define(
       type: DataTypes.STRING(50),
       allowNull: false,
     },
-    cuil: {
-      type: DataTypes.STRING(11),
-      allowNull: false,
-      unique: true,
-    },
     cuit: {
       type: DataTypes.STRING(11),
       allowNull: false,
       unique: true,
+    },
+    twoFa: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
     email: {
       type: DataTypes.STRING,
@@ -41,8 +40,6 @@ const User = sequelize.define(
     },
   },
   {
-    timestamps: true,
-    paranoid: true,
     hooks: {
       beforeValidate: async (instance) => {
         if (instance.password) {

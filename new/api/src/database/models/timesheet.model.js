@@ -17,11 +17,12 @@ const Timesheet = sequelize.define(
         key: "id",
       },
     },
-    parentId: {
+    memberId: {
       type: DataTypes.UUID,
+      allowNull: false,
       references: {
-        model: "timesheets",
         key: "id",
+        model: "members",
       },
     },
     started_at: {
@@ -34,10 +35,7 @@ const Timesheet = sequelize.define(
     paid_at: {
       type: DataTypes.DATE,
     },
-  },
-  {
-    timestamps: true,
-  },
+  }
 );
 
 module.exports = Timesheet;

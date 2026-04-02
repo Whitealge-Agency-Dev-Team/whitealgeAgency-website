@@ -9,6 +9,14 @@ const Project = sequelize.define(
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
+    company_id: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        key: "id",
+        model: "companies"
+      }
+    },
     title: {
       type: DataTypes.STRING(50),
       allowNull: false,
@@ -20,11 +28,7 @@ const Project = sequelize.define(
       type: DataTypes.ENUM(""),
       allowNull: false,
     },
-  },
-  {
-    timestamps: true,
-    paranoid: true,
-  },
+  }
 );
 
 module.exports = Project;

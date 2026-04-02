@@ -1,5 +1,5 @@
 const sequelize = require("../config");
-const { DataTypes, Op } = require("sequelize");
+const { DataTypes } = require("sequelize");
 
 const Token = sequelize.define(
   "Token",
@@ -33,7 +33,7 @@ const Token = sequelize.define(
     },
   },
   {
-    timestamps: true,
+    paranoid: false,
     hooks: {
       beforeCreate: async (instance) => {
         await instance.constructor.destroy({

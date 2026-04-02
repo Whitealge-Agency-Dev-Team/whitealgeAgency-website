@@ -1,7 +1,7 @@
 const sequelize = require("../config");
 const { DataTypes } = require("sequelize");
 
-const Log = sequelize.define("Log", {
+const Member = sequelize.define("Member", {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -9,23 +9,22 @@ const Log = sequelize.define("Log", {
   },
   associateId: {
     type: DataTypes.UUID,
-    allowNull: true,
+    allowNull: false,
+    unique: "idx_associate_project",
     references: {
-      model: "associates",
       key: "id",
+      model: "associates",
     },
   },
-  occurredAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  },
-  action: {
-    type: DataTypes.STRING,
+  projectId: {
+    type: DataTypes.UUID,
     allowNull: false,
-  },
-  metadata: {
-    type: DataTypes.JSONB,
+    unique: "idx_associate_project",
+    references: {
+      key: "id",
+      model: "projects",
+    },
   },
 });
 
-module.exports = Log;
+module.exports = Member;

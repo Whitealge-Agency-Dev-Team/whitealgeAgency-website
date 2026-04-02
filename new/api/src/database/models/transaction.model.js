@@ -13,14 +13,7 @@ const Transaction = sequelize.define(
       type: DataTypes.UUID,
       allowNull: false,
       references: {
-        model: "transactions",
-        key: "id",
-      },
-    },
-    userId: {
-      type: DataTypes.UUID,
-      references: {
-        model: "users",
+        model: "associates",
         key: "id",
       },
     },
@@ -52,10 +45,7 @@ const Transaction = sequelize.define(
     metadata: {
       type: DataTypes.JSONB,
     },
-  },
-  {
-    timestamps: true,
-  },
+  }
 );
 
 module.exports = Transaction;

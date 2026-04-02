@@ -1,5 +1,5 @@
 {
-  "name": "api",
+  "name": "zosterp-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -19,6 +19,7 @@
     "http-errors": "^2.0.1",
     "joi": "^18.0.2",
     "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^8.0.4",
     "pg": "^8.20.0",
     "sequelize": "^6.37.8",
     "ua-parser-js": "^2.0.9"

@@ -1,40 +1,18 @@
-const { loginSchema, registerSchema } = require("../schemas/auth.schema");
+require("dotenv-safe");
+const {
+  loginSchema,
+  registerSchema,
+  emailField,
+  renewPwSchema,
+  twoFaSchema,
+} = require("../schemas/auth.schema");
 const createError = require("http-errors");
+const transporter = require("../email");
+const nodemailer = require("nodemailer");
 const { User, Token } = require("../database/models");
-const UAParser = require("ua-parser-js");
 const jwt = require("jsonwebtoken");
-
-const generateTokens = async (userId, userAgent = null, res) => {
-  const accessToken = jwt.sign({ userId }, process.env.JWT_ACCESS_SECRET, {
-    expiresIn: "15m",
-  });
-
-  if (!userAgent) {
-    const uaResult = new UAParser(userAgent).getResult();
-    userAgent = `${uaResult.browser.name} ${uaResult.browser.major} - ${uaResult.os.name}`;
-  }
-
-  const token = await Token.create({
-    userId,
-    userAgent,
-    expiredAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-  });
-
-  const refreshToken = jwt.sign(
-    { tokenId: token.id },
-    process.env.JWT_REFRESH_SECRET,
-    { expiresIn: "7d" },
-  );
-
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "Strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
-
-  return accessToken;
-};
+const crypto = require("crypto");
+const generateTokens = require("../handlers/auth.handler");
 
 const refresh = async (req, res, next) => {
   try {
@@ -55,7 +33,7 @@ const refresh = async (req, res, next) => {
 
     await foundToken.destroy();
 
-    const accessToken = await generateTokens(userId, device, res);
+    const accessToken = await generateTokens(userId, res, device);
 
     return res.status(200).json({ accessToken });
   } catch (error) {
@@ -66,17 +44,15 @@ const refresh = async (req, res, next) => {
 const logout = async (req, res, next) => {
   try {
     const { refreshToken } = req.cookies;
-    if (!refreshToken) throw createError(401, "No token provided");
-
     res.clearCookie("refreshToken");
+
     try {
       const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
       await Token.destroy({ where: { id: decoded.tokenId } });
     } catch (error) {
-      throw createError(401, error);
+    } finally {
+      return res.sendStatus(200);
     }
-
-    return res.sendStatus(200);
   } catch (error) {
     next(error);
   }
@@ -92,13 +68,26 @@ const login = async (req, res, next) => {
     if (!(await foundUser?.comparePassword(value.password)))
       throw createError(401, "Invalid credentials");
 
-    const accessToken = await generateTokens(
-      foundUser.id,
-      req.headers["user-agent"],
-      res,
-    );
+    if (!foundUser.twoFa) {
+      const accessToken = await generateTokens(foundUser.id, res, req.device);
+      return res.status(200).json({ accessToken });
+    } else {
+      const code = crypto.randomInt(0, 1000000).toString().padStart(6, '0');
+      const twoFaToken = jwt.sign(
+        { code, userId: foundUser.id, device: req.device },
+        process.env.JWT_2FA_SECRET,
+        { expiresIn: "5m" },
+      );
+      const infoMail = await transporter.sendMail({
+        to: foundUser.email,
+        from: "'Zosterp' <no-reply@zosterp.com>",
+        subject: "Verificación de dos pasos",
+        html: `<p>Tu código de accceso es:<br/>${code}</p>`,
+      });
 
-    return res.status(200).json({ accessToken });
+      const mail = nodemailer.getTestMessageUrl(infoMail);
+      return res.status(200).json({ twoFaToken, mail });
+    }
   } catch (error) {
     next(error);
   }
@@ -109,18 +98,73 @@ const register = async (req, res, next) => {
     const { error, value } = registerSchema.validate(req.body);
     if (error) throw createError(401, error);
 
-    const { password, ...filteredValue } = value;
-    const [user, created] = await User.findOrCreate({
-      where: filteredValue,
-      defaults: value,
+    const newUser = await User.create(value);
+    const accessToken = await generateTokens(newUser.id, res, req.device);
+
+    return res.status(200).json({ accessToken });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const requestNewPassword = async (req, res, next) => {
+  try {
+    const { error, value: email } = emailField.validate(req.body);
+    if (error) throw createError(401, error);
+
+    const foundUser = await User.findOne({ where: { email } });
+    if (!foundUser) return res.sendStatus(200);
+
+    const recoverToken = jwt.sign(
+      { userId: foundUser.id },
+      process.env.JWT_RECOVER_SECRET,
+      { expiresIn: "15m" },
+    );
+
+    const renewPwUrl = `${process.env.API_ORIGIN}/auth/recover-password?token=${recoverToken}`;
+    const infoMail = await transporter.sendMail({
+      from: "'Zosterp' <no-reply@zosterp.com>",
+      to: foundUser.email,
+      subject: "Recuperación de contraseña",
+      html: `<p>Renueva tu contrasela haciendo <a href="${renewPwUrl}">click aquí</a><br/>Este enlace perderá validez en 15 minutos.</p>`,
     });
 
-    if (!created) throw createError(409, "Existing user");
+    return res.status(200).send(nodemailer.getTestMessageUrl(infoMail));
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const renewPassword = async (req, res, next) => {
+  try {
+    const { error, value } = renewPwSchema.validate(req.body);
+    if (error) throw createError(401, error);
+
+    const decoded = jwt.verify(value.token, process.env.JWT_RECOVER_SECRET);
+
+    await User.update(
+      { password: value.password },
+      { where: { id: decoded.userId } },
+    );
+
+    return res.sendStatus(200);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+const verifyTwoFa = async (req, res, next) => {
+  try {
+    const { error, value } = twoFaSchema.validate(req.body);
+    if (error) throw createError(401, error);
+
+    const decoded = jwt.verify(value.token, process.env.JWT_2FA_SECRET);
+    if (decoded.code != value.code) throw createError(401, "Invalid code");
 
     const accessToken = await generateTokens(
-      user.id,
-      req.headers["user-agent"],
+      decoded.userId,
       res,
+      decoded.device,
     );
 
     return res.status(200).json({ accessToken });
@@ -129,4 +173,12 @@ const register = async (req, res, next) => {
   }
 };
 
-module.exports = { login, refresh, register, logout };
+module.exports = {
+  logout,
+  refresh,
+  login,
+  register,
+  requestNewPassword,
+  renewPassword,
+  verifyTwoFa,
+};
