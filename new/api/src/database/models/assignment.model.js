@@ -1,30 +1,33 @@
-const sequelize = require("../config");
 const { DataTypes } = require("sequelize");
+const sequelize = require("../config");
 
-const Member = sequelize.define("Member", {
-  id: {
+const Assignment = sequelize.define("Assignment", {
+  roleId: {
     type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
+    allowNull: false,
+    references: {
+      model: "roles",
+      key: "id",
+    },
   },
   associateId: {
     type: DataTypes.UUID,
+    primaryKey: true,
     allowNull: false,
-    unique: "idx_associate_project",
     references: {
-      key: "id",
       model: "associates",
+      key: "id",
     },
   },
   projectId: {
     type: DataTypes.UUID,
-    allowNull: false,
-    unique: "idx_associate_project",
+    primaryKey: true,
     references: {
-      key: "id",
       model: "projects",
+      key: "id",
     },
   },
 });
 
-module.exports = Member;
+module.exports = Assignment;

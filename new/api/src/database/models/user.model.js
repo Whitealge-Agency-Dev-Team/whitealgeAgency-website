@@ -18,12 +18,7 @@ const User = sequelize.define(
       type: DataTypes.STRING(50),
       allowNull: false,
     },
-    cuit: {
-      type: DataTypes.STRING(11),
-      allowNull: false,
-      unique: true,
-    },
-    twoFa: {
+    has_2fa: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
@@ -40,6 +35,7 @@ const User = sequelize.define(
     },
   },
   {
+    defaultScope: { attributes: { exclude: ["passwordHash"] } },
     hooks: {
       beforeValidate: async (instance) => {
         if (instance.password) {

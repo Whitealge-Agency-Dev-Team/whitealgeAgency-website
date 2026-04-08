@@ -1,4 +1,3 @@
-require("dotenv-safe");
 const { Token } = require("../database/models");
 const jwt = require("jsonwebtoken");
 

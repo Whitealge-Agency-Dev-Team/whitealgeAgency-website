@@ -16,6 +16,7 @@ const Token = sequelize.define(
         key: "id",
         model: "users",
       },
+      
     },
     device: {
       type: DataTypes.STRING,
@@ -24,12 +25,6 @@ const Token = sequelize.define(
     expiredAt: {
       type: DataTypes.DATE,
       allowNull: false,
-    },
-    isValid: {
-      type: DataTypes.VIRTUAL,
-      async get() {
-        return this.expiredAt > new Date();
-      },
     },
   },
   {

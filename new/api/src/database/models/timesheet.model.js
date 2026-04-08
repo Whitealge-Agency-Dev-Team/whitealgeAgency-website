@@ -17,12 +17,12 @@ const Timesheet = sequelize.define(
         key: "id",
       },
     },
-    memberId: {
+    associateId: {
       type: DataTypes.UUID,
       allowNull: false,
       references: {
         key: "id",
-        model: "members",
+        model: "associates",
       },
     },
     started_at: {

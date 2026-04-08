@@ -2,6 +2,8 @@ const nodemailer = require("nodemailer");
 
 const testAccount = async () => await nodemailer.createTestAccount();
 
+const getEmailUrl = async (mail) => await nodemailer.getTestMessageUrl(mail)
+
 const transporter = async () => {
   return await nodemailer.createTransport({
     host: testAccount.smtp.host,
@@ -14,4 +16,4 @@ const transporter = async () => {
   });
 };
 
-module.exports = transporter;
+module.exports = {transporter, getEmailUrl};

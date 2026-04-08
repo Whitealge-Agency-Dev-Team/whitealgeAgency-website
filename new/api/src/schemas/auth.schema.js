@@ -3,11 +3,12 @@ const Joi = require("joi");
 const fields = {
   name: Joi.string().max(50).required(),
   surname: Joi.string().max(50).required(),
-  cuit: Joi.string().length(11).required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(11).required(),
-  twoFa: Joi.bool().default(false)
+  twoFa: Joi.bool().default(false),
 };
+
+const profileSchema = Joi.object({ twoFa: fields.twoFa });
 
 const tokenField = Joi.string().required();
 
@@ -16,7 +17,7 @@ const loginSchema = Joi.object({
   password: fields.password,
 });
 
-const registerSchema = Joi.object(fields);
+const registerSchema = Joi.object(fields).unknown(false);
 
 const renewPwSchema = Joi.object({
   password: fields.password,
@@ -25,13 +26,22 @@ const renewPwSchema = Joi.object({
 
 const twoFaSchema = Joi.object({
   token: tokenField,
-  code: Joi.string().length(6).required()
-})
+  code: Joi.string().length(6).required(),
+});
+
+const newPwSchema = Joi.object({
+  currentPw: fields.password,
+  newPw: fields.password,
+});
 
 module.exports = {
   loginSchema,
   registerSchema,
   emailField: fields.email,
   twoFaSchema,
-  renewPwSchema
+  renewPwSchema,
+  newPwSchema,
+  profileSchema,
+  pwField: fields.password,
+  tokenField
 };

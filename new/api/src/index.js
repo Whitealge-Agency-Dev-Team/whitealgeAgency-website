@@ -3,8 +3,9 @@ const coookieParser = require("cookie-parser");
 const express = require("express");
 const sequelize = require("./database/config");
 const cors = require("cors");
-const { authRouter } = require("./routes");
+const { authRouter, profileRouter, testRouter } = require("./routes");
 const errorHandler = require("./handlers/error.handler");
+const { isAuth } = require("./middlewares/auth.middleware");
 
 const corsConfig = cors({
   origin: process.env.API_ORIGIN,
@@ -18,10 +19,10 @@ const app = express();
 app.use(express.json());
 app.use(coookieParser());
 app.use(corsConfig);
-
-app.get("/health", (_, res) => res.status(200).send("OK"));
+app.use("/test", testRouter);
 app.use("/auth", authRouter);
-
+app.use("/profile", isAuth, profileRouter);
+ 
 app.use(errorHandler);
 
 sequelize

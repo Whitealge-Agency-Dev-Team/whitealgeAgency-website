@@ -18,6 +18,6 @@ router.post("/login", getDevice, login);
 router.post("/register", getDevice, register);
 router.post("/request-new-password", requestNewPassword);
 router.post("/renew-password", renewPassword);
-router.post("/verify-twofa", verifyTwoFa);
+router.post("/verify-2fa", verifyTwoFa);
 
 module.exports = router;

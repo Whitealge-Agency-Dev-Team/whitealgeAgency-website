@@ -25,6 +25,13 @@ const Associate = sequelize.define("Associate", {
       key: "id",
     },
   },
+  status: {
+    type: DataTypes.ENUM("active"),
+    defaultValue: "active",
+  },
+  metadata: {
+    type: DataTypes.JSONB,
+  },
 });
 
 module.exports = Associate;

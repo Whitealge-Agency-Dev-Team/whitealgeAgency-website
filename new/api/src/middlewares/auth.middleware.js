@@ -1,9 +1,8 @@
-require("dotenv-safe").config();
 const UAParser = require("ua-parser-js");
 const createError = require("http-errors");
 const jwt = require("jsonwebtoken");
 
-const getAccessToken = async (req, _res, next) => {
+const isAuth = async (req, _, next) => {
   try {
     const header = req.headers["authorization"];
     const token = header?.split(" ")[1];
@@ -14,7 +13,7 @@ const getAccessToken = async (req, _res, next) => {
     try {
       decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
     } catch (error) {
-      throw createError(401, error)
+      throw createError(401, error);
     }
 
     req.user = { id: decoded.userId };
@@ -24,18 +23,18 @@ const getAccessToken = async (req, _res, next) => {
   }
 };
 
-const getDevice = async (req, _res, next) => {
+const getDevice = async (req, _, next) => {
   try {
-    const uaResult = new UAParser().getResult();
-    const device = uaResult
+    const uaResult = new UAParser(req.headers["user-agent"]).getResult();
+    const parsedResult = uaResult
       ? `${uaResult?.browser?.name} ${uaResult?.browser?.major} - ${uaResult?.os?.name}`
       : "Unkwon";
 
-    req.device = device;
-    return next()
+    req.ua = { parsedResult, result: uaResult };
+    return next();
   } catch (error) {
     return next(error);
   }
 };
 
-module.exports = { getAccessToken, getDevice };
+module.exports = { isAuth, getDevice };

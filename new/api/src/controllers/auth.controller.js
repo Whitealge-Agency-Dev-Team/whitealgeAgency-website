@@ -1,4 +1,3 @@
-require("dotenv-safe");
 const {
   loginSchema,
   registerSchema,
@@ -7,8 +6,7 @@ const {
   twoFaSchema,
 } = require("../schemas/auth.schema");
 const createError = require("http-errors");
-const transporter = require("../email");
-const nodemailer = require("nodemailer");
+const { transporter, getEmailUrl } = require("../email");
 const { User, Token } = require("../database/models");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
@@ -60,21 +58,29 @@ const logout = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    const { error, value } = loginSchema.validate(req.body);
+    const {
+      error,
+      value: { email, password },
+    } = loginSchema.validate(req.body);
     if (error) throw createError(400, error);
 
-    const foundUser = await User.findOne({ where: { email: value.email } });
+    const { parsedResult: device } = req.ua;
+    const foundUser = await User.scope(null).findOne({
+      where: { email },
+      plain: true,
+    });
 
-    if (!(await foundUser?.comparePassword(value.password)))
+    if (!(await foundUser?.comparePassword(password)))
       throw createError(401, "Invalid credentials");
 
-    if (!foundUser.twoFa) {
-      const accessToken = await generateTokens(foundUser.id, res, req.device);
-      return res.status(200).json({ accessToken });
+    if (!foundUser.has_2fa) {
+      const accessToken = await generateTokens(foundUser.id, res, device);
+      const { passwordHash, ...user } = foundUser;
+      return res.status(200).json({ accessToken, user });
     } else {
-      const code = crypto.randomInt(0, 1000000).toString().padStart(6, '0');
+      const code = crypto.randomInt(0, 1000000).toString().padStart(6, "0");
       const twoFaToken = jwt.sign(
-        { code, userId: foundUser.id, device: req.device },
+        { code, userId: foundUser.id, device: device },
         process.env.JWT_2FA_SECRET,
         { expiresIn: "5m" },
       );
@@ -84,9 +90,10 @@ const login = async (req, res, next) => {
         subject: "Verificación de dos pasos",
         html: `<p>Tu código de accceso es:<br/>${code}</p>`,
       });
-
-      const mail = nodemailer.getTestMessageUrl(infoMail);
-      return res.status(200).json({ twoFaToken, mail });
+      const data = { twoFaToken };
+      if (process.env.NODE_ENV === "development")
+        data.mail = await getEmailUrl(infoMail);
+      return res.status(200).json(data);
     }
   } catch (error) {
     next(error);
@@ -98,10 +105,13 @@ const register = async (req, res, next) => {
     const { error, value } = registerSchema.validate(req.body);
     if (error) throw createError(401, error);
 
-    const newUser = await User.create(value);
-    const accessToken = await generateTokens(newUser.id, res, req.device);
+    const { parsedResult: device } = req.ua;
 
-    return res.status(200).json({ accessToken });
+    const newUser = await User.create(value, { returning: true });
+    const accessToken = await generateTokens(newUser.id, res, device);
+
+    const { passwordHash, ...user } = newUser;
+    return res.status(200).json({ accessToken, user });
   } catch (error) {
     next(error);
   }
@@ -129,7 +139,11 @@ const requestNewPassword = async (req, res, next) => {
       html: `<p>Renueva tu contrasela haciendo <a href="${renewPwUrl}">click aquí</a><br/>Este enlace perderá validez en 15 minutos.</p>`,
     });
 
-    return res.status(200).send(nodemailer.getTestMessageUrl(infoMail));
+    const data =
+      process.env.NODE_ENV === "development"
+        ? { mail: await getEmailUrl(infoMail) }
+        : {};
+    return res.status(200).json(data);
   } catch (error) {
     return next(error);
   }
@@ -137,13 +151,16 @@ const requestNewPassword = async (req, res, next) => {
 
 const renewPassword = async (req, res, next) => {
   try {
-    const { error, value } = renewPwSchema.validate(req.body);
+    const {
+      error,
+      value: { token, password: newPassword },
+    } = renewPwSchema.validate(req.body);
     if (error) throw createError(401, error);
 
-    const decoded = jwt.verify(value.token, process.env.JWT_RECOVER_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_RECOVER_SECRET);
 
     await User.update(
-      { password: value.password },
+      { password: newPassword },
       { where: { id: decoded.userId } },
     );
 
@@ -155,11 +172,14 @@ const renewPassword = async (req, res, next) => {
 
 const verifyTwoFa = async (req, res, next) => {
   try {
-    const { error, value } = twoFaSchema.validate(req.body);
+    const {
+      error,
+      value: { token, code },
+    } = twoFaSchema.validate(req.body);
     if (error) throw createError(401, error);
 
-    const decoded = jwt.verify(value.token, process.env.JWT_2FA_SECRET);
-    if (decoded.code != value.code) throw createError(401, "Invalid code");
+    const decoded = jwt.verify(token, process.env.JWT_2FA_SECRET);
+    if (decoded.code != code) throw createError(401, "Invalid code");
 
     const accessToken = await generateTokens(
       decoded.userId,
@@ -167,7 +187,10 @@ const verifyTwoFa = async (req, res, next) => {
       decoded.device,
     );
 
-    return res.status(200).json({ accessToken });
+    const foundUser = await User.findByPk(decoded.userId, { plain: true });
+    const { passwordHash, ...user } = foundUser;
+
+    return res.status(200).json({ accessToken, user });
   } catch (error) {
     next(error);
   }
