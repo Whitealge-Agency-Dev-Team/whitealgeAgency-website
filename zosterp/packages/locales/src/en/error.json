@@ -1,0 +1,6 @@
+{
+  "INTERNAL_SERVER_ERRROR": "An unexpected error ocurred.",
+  "EMAIL_EMPTY": "Email is required.",
+  "PW_EMPTY": "Password is required.",
+  "PW_MIN": "Password must have at least * characters."
+}

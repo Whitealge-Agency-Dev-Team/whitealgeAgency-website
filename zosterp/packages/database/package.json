@@ -1,0 +1,22 @@
+{
+  "name": "@zosterp/database",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "type": "module",
+  "private": "true",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "pg": "^8.20.0",
+    "sequelize": "^6.37.8"
+  }
+}
