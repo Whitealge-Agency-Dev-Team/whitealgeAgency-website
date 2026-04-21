@@ -15,6 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@zosterp/locales": "workspace:^",
     "bcrypt": "^6.0.0",
     "pg": "^8.20.0",
     "sequelize": "^6.37.8"

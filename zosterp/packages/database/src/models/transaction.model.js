@@ -7,20 +7,24 @@ export const Transaction = sequelize.define("Transaction", {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
-  associateId: {
+  parentId: {
     type: DataTypes.UUID,
-    allowNull: false,
     references: {
-      model: "associates",
+      model: "transactions",
       key: "id",
     },
   },
-  invoiceId: {
+  assignmentId: {
     type: DataTypes.UUID,
+    allowNull: false,
     references: {
-      model: "invoices",
+      model: "assignments",
       key: "id",
     },
+  },
+  method: {
+    type: DataTypes.ENUM("cash"),
+    allowNull: false,
   },
   reason: {
     type: DataTypes.STRING,
@@ -30,20 +34,29 @@ export const Transaction = sequelize.define("Transaction", {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
   },
+  installments: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1,
+  },
   currency: {
     type: DataTypes.ENUM("ARS", "USD", "EUR"),
     defaultValue: "ARS",
     allowNull: false,
   },
-  emitted_at: {
+  ocurred_at: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW(),
   },
-  status: {
-    type: DataTypes.ENUM(""),
-    allowNull: false,
+  isFixed: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
-  metadata: {
-    type: DataTypes.JSONB,
+  isProfit: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+  status: {
+    type: DataTypes.ENUM("pending", "cancelled", "done"),
+    allowNull: false,
   },
 });

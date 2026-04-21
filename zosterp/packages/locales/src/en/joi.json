@@ -1,0 +1,15 @@
+{
+  "email_empty": "Email is required.",
+  "name_required": "Name is required.",
+  "surname_empty": "Surname is required.",
+  "password_empty": "Password is required.",
+  "password_too_short": "Password is too short",
+  "confirmPassword_empty": "You must confirm yout password",
+
+  "email_invalid": "Invalid email",
+  "password_invalid": "Invalid password.",
+  "password_not_match": "Passwords must be the same.",
+  "invalid_credentials": "Invalid credentials.",
+
+  "invalid_code": "Invalid code."
+}

@@ -8,7 +8,6 @@ import { Permission } from "./permission.model.js";
 import { Associate } from "./associate.model.js";
 import { Token } from "./token.model.js";
 import { Company } from "./company.model.js";
-import { Invoice } from "./invoice.model.js";
 import { Assignment } from "./assignment.model.js";
 
 Role.hasMany(Permission, { foreignKey: "role_id" });
@@ -32,8 +31,8 @@ Task.belongsTo(Project, { foreignKey: "project_id" });
 Task.hasMany(Timesheet, { foreignKey: "task_id" });
 Timesheet.belongsTo(Task, { foreignKey: "task_id" });
 
-Associate.hasMany(Timesheet, { foreignKey: "associate_id" });
-Timesheet.belongsTo(Associate, { foreignKey: "associate_id" });
+Assignment.hasMany(Timesheet, { foreignKey: "assignment_id" });
+Timesheet.belongsTo(Assignment, { foreignKey: "assignment_id" });
 
 Project.hasMany(Assignment, { foreignKey: "project_id" });
 Assignment.belongsTo(Project, { foreignKey: "project_id" });
@@ -44,11 +43,8 @@ Assignment.belongsTo(Associate, { foreignKey: "associate_id" });
 Role.hasMany(Assignment, { foreignKey: "role_id" });
 Assignment.belongsTo(Role, { foreignKey: "role_id" });
 
-Associate.hasMany(Transaction, { foreignKey: "associate_id" });
-Transaction.belongsTo(Associate, { foreignKey: "associate_id" });
-
-Invoice.hasMany(Transaction, { foreignKey: "invoice_id" });
-Transaction.belongsTo(Invoice, { foreignKey: "invoice_id" });
+Assignment.hasMany(Transaction, { foreignKey: "assignment_id" });
+Transaction.belongsTo(Assignment, { foreignKey: "assignment_id" });
 
 export {
   User,
@@ -60,7 +56,6 @@ export {
   Permission,
   Assignment,
   Associate,
-  Invoice,
   Company,
   Token,
 };

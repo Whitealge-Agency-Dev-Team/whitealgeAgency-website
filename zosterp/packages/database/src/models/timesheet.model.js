@@ -15,12 +15,12 @@ export const Timesheet = sequelize.define("Timesheet", {
       key: "id",
     },
   },
-  associateId: {
+  assignmentId: {
     type: DataTypes.UUID,
     allowNull: false,
     references: {
       key: "id",
-      model: "associates",
+      model: "assignments",
     },
   },
   started_at: {

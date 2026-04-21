@@ -1,25 +1,18 @@
 import jwt from "jsonwebtoken";
 import { Token } from "@zosterp/database";
 
-export const generateTokens = async ({
-  userId,
-  language = "en",
-  res,
-  device = "Unknown",
-}) => {
+export const generateTokens = async (req, res, next) => {
   try {
-    const accessToken = jwt.sign({ userId }, process.env.JWT_ACCESS_SECRET, {
-      expiresIn: "15m",
-    });
+    const { device } = req.ua;
+    const { id: userId, language } = req.user;
 
-    const token = await Token.create({
-      userId,
-      device,
-      expiredAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    });
+    const days = 7 * 24 * 60 * 60 * 1000; //7 days
+    const expiredAt = new Date(Date.now() + days);
+    const { id: tokenId } = (await Token.create({ userId, device, expiredAt }))
+      .dataValues;
 
     const refreshToken = jwt.sign(
-      { tokenId: token.id, language },
+      { tokenId, language },
       process.env.JWT_REFRESH_SECRET,
       { expiresIn: "7d" },
     );
@@ -27,12 +20,16 @@ export const generateTokens = async ({
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: "strict",
+      maxAge: days,
     });
 
-    return accessToken;
+    const accessToken = jwt.sign({ userId }, process.env.JWT_ACCESS_SECRET, {
+      expiresIn: "15m",
+    });
+
+    return res.status(200).json({ user: req.user, accessToken });
   } catch (error) {
-    throw error;
+    next(error);
   }
 };

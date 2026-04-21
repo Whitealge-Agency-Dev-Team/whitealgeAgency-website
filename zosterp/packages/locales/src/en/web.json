@@ -1,0 +1,13 @@
+{
+  "login": "Login",
+  "register": "Sign Up",
+  "name": "Name",
+  "surname": "Surname",
+  "email": "Email",
+  "password": "Password",
+  "confirmPassword": "Confirm password",
+  "send": "Send",
+  "loading": "Loading",
+  "back": "back",
+  "renew_pw_success": "We sent an email to you for renew your password."
+}

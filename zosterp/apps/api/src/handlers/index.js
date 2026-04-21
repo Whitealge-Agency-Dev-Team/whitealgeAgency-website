@@ -1,2 +1,2 @@
-export { errorHandler } from "./error.handler.js";
-export { generateTokens } from "./auth.handler.js"
+export * from "./error.handler.js";
+export * from "./auth.handler.js"

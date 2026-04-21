@@ -1,6 +1,7 @@
 import { sequelize } from "../config.js";
 import { DataTypes } from "sequelize";
 import { hash, compare, genSalt } from "bcrypt";
+import { languageList } from "@zosterp/locales";
 
 export const User = sequelize.define(
   "User",
@@ -36,17 +37,17 @@ export const User = sequelize.define(
     },
     password: {
       type: DataTypes.VIRTUAL,
-      validate: { len: [11, 255] },
     },
     language: {
-      type: DataTypes.ENUM("en", "es"),
+      type: DataTypes.ENUM(...languageList),
       defaultValue: "en",
     },
   },
   {
+    paranoid: true,
     defaultScope: { attributes: { exclude: ["passwordHash"] } },
     hooks: {
-      beforeSave: async (user) => {
+      beforeValidate: async (user) => {
         if (user.changed("password")) {
           const salt = await genSalt(10);
           user.passwordHash = await hash(user.password, salt);

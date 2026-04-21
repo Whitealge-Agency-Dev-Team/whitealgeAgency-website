@@ -1,64 +1,67 @@
 import Joi from "joi";
+import { languageList } from "@zosterp/locales";
 
-const tokenField = Joi.string().required().messages({
-  "string.base": "TOKEN_STR",
-  "any.required": "TOKEN_EMPTY",
-  "string.empty": "TOKEN_EMPTY",
+export const email = Joi.string()
+  .email({ tlds: { allow: false } })
+  .trim()
+  .required()
+  .messages({
+    "string.empty": "email_required",
+    "string.email": "email_invalid",
+    "any.required": "email_required",
+  });
+
+const password = Joi.string().trim().min(11).required().messages({
+  "string.empty": "password_required",
+  "string.min": "password_too_short",
+  "any.required": "password_required",
 });
 
-const pwField = Joi.string().min(11).required().messages({
-  "string.base": "PW_STR",
-  "string.min": "PW_MIN.{#limit}",
-  "any.required": "PW_EMPTY",
-  "string.empty": "PW_EMPTY",
+const confirmPassword = Joi.string()
+  .required()
+  .valid(Joi.ref("password"))
+  .messages({
+    "string.empty": "confirmPassword_required",
+    "any.required": "confirmPassword_required",
+    "any.only": "confirmPassword_not_match",
+  });
+
+const token = Joi.string().required().messages({
+  "string.empty": "token_required",
+  "any.required": "token_required",
 });
 
-export const emailField = Joi.string().email().required().messages({
-  "string.base": "EMAIL_STR",
-  "string.email": "EMAIL_FORMAT",
-  "string.empty": "EMAIL_EMPTY",
-  "any.required": "EMAIL_EMPTY",
-});
-
-const fields = {
-  name: Joi.string().required().messages({
-    "string.base": "NAME_STR",
-    "string.empty": "NAME_EMPTY",
-    "any.required": "NAME_EMPTY",
+export const registerSchema = Joi.object({
+  name: Joi.string().trim().lowercase().required().messages({
+    "string.empty": "name_required",
+    "any.required": "name_required",
   }),
-  surname: Joi.string().required().messages({
-    "string.base": "SURNAME_STR",
-    "string.empty": "SURNAME_EMPTY",
-    "any.required": "SURNAME_EMPTY",
+  surname: Joi.string().trim().lowercase().required().messages({
+    "string.empty": "surname_required",
+    "any.required": "surname_required",
   }),
-  password: pwField,
-  has_2fa: Joi.bool().default(false).messages({
-    "boolean.base": "2FA_BOOL",
-  }),
-  language: Joi.string().length(2).default("en").messages({
-    "string.base": "LANG_STR",
-    "string.length": "LANG_LEN.{#limit}",
-  }),
-};
-
-export const registerSchema = Joi.object({ ...fields, email: emailField });
-
-export const loginSchema = Joi.object({
-  email: emailField,
-  password: fields.password,
+  email,
+  password,
+  confirmPassword,
+  language: Joi.string()
+    .valid(...languageList)
+    .default("en")
+    .messages({ "any.only": "language_invalid" }),
 });
 
-export const renewPwSchema = Joi.object({
-  token: tokenField,
-  password: pwField,
-});
-
-export const twoFaSchema = Joi.object({
-  token: tokenField,
+export const schema2fa = Joi.object({
   code: Joi.string().length(6).required().messages({
-    "string.base": "CODE_STR",
-    "string.empty": "CODE_EMPTY",
-    "any.required": "CODE_EMPTY",
-    "string.length": "CODE_LEN.{#limit}",
+    "string.empty": "code_required",
+    "any.required": "code_required",
+    "string.length": "code_invalid",
   }),
+  token,
 });
+
+export const renewPasswordSchema = Joi.object({
+  token,
+  password,
+  confirmPassword,
+});
+
+export const loginSchema = Joi.object({ password, email });

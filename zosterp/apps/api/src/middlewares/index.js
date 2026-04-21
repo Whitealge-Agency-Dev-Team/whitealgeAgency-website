@@ -1,3 +1,4 @@
-export { getDevice } from "./device.middleware.js"
-export { getLanguage } from "./language.middleware.js"
-export { isAuth } from "./auth.middleware.js"
+export * from "./device.middleware.js";
+export * from "./language.middleware.js";
+export * from "./auth.middleware.js";
+export * from "./validate.middleware.js";

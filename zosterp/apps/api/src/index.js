@@ -40,7 +40,6 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(getLanguage);
 
-app.use("/test", (_, res) => res.status(200).send("OK"));
 app.use("/auth", authRoute);
 
 app.use(errorHandler);

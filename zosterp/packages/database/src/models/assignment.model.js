@@ -2,9 +2,14 @@ import { sequelize } from "../config.js";
 import { DataTypes } from "sequelize";
 
 export const Assignment = sequelize.define("Assignment", {
-  roleId: {
+  id: {
     type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
+  },
+  roleId: {
+    unique: "idx_assignment",
+    type: DataTypes.UUID,
     allowNull: false,
     references: {
       model: "roles",
@@ -12,8 +17,8 @@ export const Assignment = sequelize.define("Assignment", {
     },
   },
   associateId: {
+    unique: "idx_assignment",
     type: DataTypes.UUID,
-    primaryKey: true,
     allowNull: false,
     references: {
       model: "associates",
@@ -21,8 +26,8 @@ export const Assignment = sequelize.define("Assignment", {
     },
   },
   projectId: {
+    unique: "idx_assignment",
     type: DataTypes.UUID,
-    primaryKey: true,
     references: {
       model: "projects",
       key: "id",
